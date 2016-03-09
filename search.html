@@ -66,10 +66,12 @@
 				var priceCell = row.insertCell(2);
 				var profile = row.insertCell(3);
 
-				nameCell.style.border = "thin solid #000000";
-				ratingCell.style.border = "thin solid #000000";
-				priceCell.style.border = "thin solid #000000";
-				profile.style.border = "thin solid #000000";
+				row.style.border = "thin solid #000000";
+
+				nameCell.className = "name";
+				ratingCell.className = "rating_cell";
+				priceCell.className = "price_cell";
+				profile.className = "profile_cell";
 
 				nameCell.innerHTML = json.results[i].name;
 				priceCell.innerHTML = json.results[i].price;
@@ -106,6 +108,21 @@
 				}
 
 			}
+
+			var headerRow = table.insertRow(0);
+			var nameTitle = headerRow.insertCell(0);
+			var ratingTitle = headerRow.insertCell(1);
+			var priceTitle = headerRow.insertCell(2);
+			var profileTitle = headerRow.insertCell(3);
+
+			headerRow.className = "tableHeader";
+
+			nameTitle.innerHTML = "Name";
+			ratingTitle.innerHTML = "Ratting";
+			priceTitle.innerHTML = "Price";
+			profileTitle.innerHTML = "Profile";
+
+			headerRow.style.border = "thin solid #000000";
 
 			div.appendChild(table);
 
