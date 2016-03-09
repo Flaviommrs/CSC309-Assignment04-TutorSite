@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<!--Head Info-->
+  <head>
+    <link rel='stylesheet' href='fullcalendar/fullcalendar.css' />
+    <script src='lib/jquery.min.js'></script>
+    <script src='lib/moment.min.js'></script>
+    <script src='fullcalendar/fullcalendar.js'></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Tutor Me - Registration Page</title>
+    <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
+
+    <script>
+    $(document).ready(function() {
+
+        // page is now ready, initialize the calendar...
+
+        $('#calendar').fullCalendar({
+            // put your options and callbacks here
+        })
+
+    });
+    </script>
+  </head>
+
+<!-- Header bar -->
+<div class="header">
+	<img  id="logo" src="logo.png" alt="Logo"> <!-- current logo temporary will replace -->
+</div>
+<div class="header_text">
+    <h1>
+        Welcome to Tutor Me!
+    </h1>
+</div>
+<div class="content">
+    <h1> Sign up to TutorMe </h1>
+
+    <form id='register'>
+        <fieldset>
+            <legend>Register</legend>
+                <label for='name'>Name*:</label>
+                <input type='text' name='name' id='name' maxlength="50" />
+                <br/>
+                <label for='email' >Email Address*:</label>
+                <input type='text' name='email' id='email' maxlength="50" />
+                <br/>
+                <label for='username' >UserName*:</label>
+                <input type='text' name='username' id='username' maxlength="50" />
+                <br/>
+                <label for='password' >Password*:</label>
+                <input type='password' name='password' id='password' maxlength="50" />
+                <br/>
+                <label for='type_of_user' >Do you want to Tutor?</label>
+                <input type='checkbox' name='type_of_user' id='type_of_user' value="Yes"/>
+                <br/>
+                <fieldset display='none'>
+                    <legend>Subjects I want to teach</legend>
+                        <input type='checkbox' name='math' id='math' value="Math"/>
+                        <label for="math">Math</label>
+                        <input type='checkbox' name='biology' id='biology' value="Biology"/>
+                        <label for="biology">Biology</label>
+                        <input type='checkbox' name='chemistry' id='chemistry' value="Chemistry"/>
+                        <label for="chemistry">Chemistry</label>
+                        <br/>
+                        <input type='checkbox' name='physics' id='physics' value="Physics"/>
+                        <label for="physics">Physics</label>
+                        <input type='checkbox' name='geography' id='geography' value="Geography"/>
+                        <label for="geography">Geography</label>
+                        <input type='checkbox' name='english' id='english' value="Engligh"/>
+                        <label for="english">Engligh</label>
+                        <br/>
+                        <input type='checkbox' name='history' id='history' value="History"/>
+                        <label for="history">History</label>
+                </fieldset>
+                <br/>
+                <label for='profile_pic' >Profile Picture:</label>
+                <input type='file' name='profile_pic' id='profile_pic' accept="image/*" capture/>
+                <br/>
+                <br/>
+                <div id='calendar'></div>
+                <br/>
+                <br/>
+                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe' /></div>
+        </fieldset>
+    </form>
+</div>
+
+</html>
