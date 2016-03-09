@@ -106,10 +106,6 @@ html {
 		font-size: 14px;
 		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
 }
-#calendar table, #calendar td{
-	    margin: 0;
-	    border: 1px solid #575453;
-}
 #wrap {
     width: 1100px;
     margin: 0 auto;
