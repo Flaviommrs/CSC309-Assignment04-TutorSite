@@ -53,6 +53,7 @@
 			eventLimit: true, // allow "more" link when too many events
 			events: [],
 
+
             eventClick: function(calEvent, jsEvent, view) {
                 //Change the border color of the event to red
                 $(this).css('border-color', 'red');
@@ -67,14 +68,34 @@
 
 		});
 
+        //$('#calendar').fullCalendar('clientEvents');
+
 	});
+
+    function getEvents()
+    {
+        var myEvents = $('#calendar').fullCalendar('clientEvents');
+        //TODO: PLACEHOLDER - Prints the title and startdate of each event
+        /*
+        for (var i = 0; i < myEvents.length; i++)
+        {
+            alert("" + myEvents[i].title + ": " + myEvents[i].start);
+        }
+        */
+    }
+
+    function sendForm()
+    {
+        getEvents();
+        //TODO!
+    }
 
     </script>
   </head>
 
 <!-- Header bar -->
 <div class="header">
-	<img  id="logo" src="logo.png" alt="Logo"> <!-- current logo temporary will replace -->
+	<img  id="logo" src="logo.png" alt="Logo">
 </div>
 <div class="header_text">
     <h1>
@@ -163,7 +184,7 @@
                 </div>
                 <br/>
                 <br/>
-                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe' /></div>
+                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe' onclick="sendForm()" /></div>
         </fieldset>
     </form>
 </div>
