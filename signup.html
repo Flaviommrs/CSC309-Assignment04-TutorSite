@@ -72,20 +72,57 @@
 
 	});
 
-    function getEvents()
-    {
-        var myEvents = $('#calendar').fullCalendar('clientEvents');
-        //TODO: PLACEHOLDER - Prints the title and startdate of each event
-        /*
-        for (var i = 0; i < myEvents.length; i++)
-        {
-            alert("" + myEvents[i].title + ": " + myEvents[i].start);
-        }
-        */
-        return myEvents;
-    }
+    </script>
 
-    function sendForm()
+    <script>
+    //Converting form to JSON
+    //Source: http://jsfiddle.net/sxGtM/3/ - http://stackoverflow.com/questions/1184624/convert-form-data-to-javascript-object-with-jquery
+    $.fn.serializeObject = function()
+    {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+    };
+
+    $(function() {
+        $('form').submit(function() {
+            var TWO_HOURS = 7200;
+            var myEvents = $('#calendar').fullCalendar('clientEvents');
+
+            var nonCircularEvents = [];
+            for (var i = 0; i < myEvents.length; i++)
+            {
+                var newEvent = {};
+                newEvent.start = myEvents[i].start;
+                if(myEvents[i].end == null){
+                    newEvent.end = moment(myEvents[i].start).add(2, 'hours');
+                }
+                else{
+                        newEvent.end = myEvents[i].end;
+                }
+                nonCircularEvents.push(newEvent);
+            }
+
+            myJSONObj = $('form').serializeObject();
+            myJSONObj.events = nonCircularEvents;
+
+            //TODO: SUBMIT THE FORM INSTEAD OF ALERTING
+            alert(JSON.stringify(myJSONObj));
+            return false;
+        });
+    });
+
+    function sendForm(inputJSON)
     {
         var myEvents = getEvents();
         var MongoClient = require('mongodb').MongoClient;
@@ -109,10 +146,9 @@
           collection.insert(lotsOfDocs, {w:1}, function(err, result) {});
 
         });
-        //TODO!
     }
-
     </script>
+
   </head>
 
 <!-- Header bar -->
@@ -206,7 +242,7 @@
                 </div>
                 <br/>
                 <br/>
-                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe' onclick="sendForm()" /></div>
+                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe'/></div>
         </fieldset>
     </form>
 </div>
