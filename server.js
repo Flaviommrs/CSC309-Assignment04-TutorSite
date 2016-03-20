@@ -63,6 +63,25 @@ var server = http.createServer(function(request, response) {
                 }
             });
 
+        }else if(parameters[0] == "facebookAPI.js"){
+
+        	var file = fs.readFileSync('./facebookAPI.js', 'utf8');
+		    response.writeHead(200, {"Content-Type": "text/javascript"});
+		    response.end(file);
+
+
+        }else if(parameters[0] == "login.js"){
+
+        	var file = fs.readFileSync('./login.js', 'utf8');
+		    response.writeHead(200, {"Content-Type": "text/javascript"});
+		    response.end(file);
+
+        }else if(parameters[0] == "fblog"){
+        
+        	var file = fs.readFileSync('./facebookLog.html', 'utf8');
+		    response.writeHead(200, {"Content-Type": "text/html"});
+		    response.end(file);
+
         }
         else
         {
