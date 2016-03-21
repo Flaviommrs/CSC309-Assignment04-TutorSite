@@ -1,7 +1,8 @@
 /* Use This File to create the server */
 var http = require("http"),
     fs = require("fs"),
-    urlModule = require("url");
+    urlModule = require("url"),
+    queryString = require('querystring');
 
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
@@ -15,7 +16,19 @@ var server = http.createServer(function(request, response) {
     var url = request.url;
     url = decodeURIComponent(url);
 
+    var queryParams;
+
+    if (url.indexOf('?') >= 0) {
+        url = url.substring(0, url.indexOf('?'));
+
+        queryParams = queryString.parse(request.url.replace(/^.*\?/, ''));
+        console.log(queryParams.data);
+    }
+
+
     console.log("Received request of " + url);
+    console.log("Query vars received = " + queryParams['data']);
+
 
     /* Separates the multiple parameters of the url and inserts into a parameter
      array */
@@ -25,7 +38,6 @@ var server = http.createServer(function(request, response) {
     {
         if(temp[i] != '' && temp[i] != "index.html"){
             parameters.push(temp[i]);
-            console.log(temp[i] + "  ");
         }
     }
 
