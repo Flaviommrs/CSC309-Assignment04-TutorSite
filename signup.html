@@ -118,10 +118,27 @@
 
             //TODO: SUBMIT THE FORM INSTEAD OF ALERTING
             alert(JSON.stringify(myJSONObj));
+
+            // Sending and receiving data in JSON format using POST method
+            xhr = new XMLHttpRequest();
+            var url = "http://127.0.0.1:3000/registration?data=" + encodeURIComponent(JSON.stringify(myJSONObj));
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var serverResponse = xhr.responseText;
+                    //TODO: Check according to the response if the
+                    //data was successfully saved to the DB
+                }
+            }
+            xhr.send();
+
             return false;
         });
     });
 
+    //Unused function - experimenting with JS and MongoDB here
+    /*
     function sendForm(inputJSON)
     {
         var myEvents = getEvents();
@@ -147,6 +164,7 @@
 
         });
     }
+    */
     </script>
 
   </head>

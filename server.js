@@ -13,6 +13,7 @@ var port = 3000;
 
 var server = http.createServer(function(request, response) {
     var url = request.url;
+    url = decodeURIComponent(url);
 
     console.log("Received request of " + url);
 
@@ -24,13 +25,15 @@ var server = http.createServer(function(request, response) {
     {
         if(temp[i] != '' && temp[i] != "index.html"){
             parameters.push(temp[i]);
+            console.log(temp[i] + "  ");
         }
     }
+
 
     /* Selects the response according to the URL */
     if(parameters.length != 0)
     {
-        if(parameters[0] == "users")
+        if(parameters[0] == "registration")
         {
             //http://blog.modulus.io/mongodb-tutorial
             MongoClient.connect(urlDB, function (err, db) {
@@ -42,6 +45,9 @@ var server = http.createServer(function(request, response) {
 
                 // Get the documents collection
                 var collection = db.collection('users');
+
+                //Handle the data
+                var dataReceived = JSON.parse()
 
                 //Create some users
                 var user1 = {name: 'modulus admin', age: 42, roles: ['admin', 'moderator', 'user']};
@@ -77,7 +83,7 @@ var server = http.createServer(function(request, response) {
 		    response.end(file);
 
         }else if(parameters[0] == "fblog"){
-        
+
         	var file = fs.readFileSync('./facebookLog.html', 'utf8');
 		    response.writeHead(200, {"Content-Type": "text/html"});
 		    response.end(file);
