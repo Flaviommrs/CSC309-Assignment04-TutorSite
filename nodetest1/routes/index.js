@@ -1,4 +1,9 @@
 var express = require('express');
+
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 var router = express.Router();
 
 /* GET home page. */
@@ -60,6 +65,26 @@ router.get('/search', function(req, res, next) {
 /* GET weekview page. */
 router.get('/weekView', function(req, res, next) {
     res.render('weekview.html', {});
+});
+
+/* GET weekview page. */
+router.get('/registration', function(req, res, next) {
+    console.log("I just received the following data: ");
+    res.render('weekview.html', {});
+    //console.log(req.query.data);
+});
+
+io.on('connection', function(client){
+  console.log('a user connected');
+
+  client.on('register', function(data) {
+        console.log("THE DATA IS EQUAL TO: ");
+        console.log(data);
+    });
+});
+
+http.listen(4200, function(){
+  console.log('listening SOCKET on *:4200');
 });
 
 module.exports = router;
