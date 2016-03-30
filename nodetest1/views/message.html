@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/message_style.css">
     <title>Tutor Me: Send message</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
-    <script src='javascript/lib/jquery.min.js'></script>
+    <script src="http://code.jquery.com/jquery-1.12.2.js"></script>
 
     <script>
 
@@ -13,9 +13,9 @@
         function enterSubmit(e){
           if(e.keyCode==13)
           {
-            $('#sendMsg').click();
-            $('#myMsg').keypress(enterSubmit);
-            $('#myMsg').focus();
+            $('#send').click();
+            $('#m').keypress(enterSubmit);
+            $('#m').focus();
             $('#messageBoard').animate({
                 scrollTop: $('#messageBoard').get(0).scrollHeight
             }, 1500);
@@ -23,8 +23,8 @@
           }
 
         }
-        $('#myMsg').keypress(enterSubmit);
-});
+        $('#m').keypress(enterSubmit);
+    });
 
     </script>
   </head>
@@ -44,29 +44,39 @@
 <button class="user">John Smith</button>
 </div>
 
-<div class="prev_msg" id=messageBoard>
+<div class="prev_msg" id="messageBoard">
   <div class="msg1">
   <p>Hi, I would like to hire you as my tutor! </p>
   </div>
 
   <div class="send_msg">
     <div class="send">
-        <input type="text" placeholder="Write Message" required="" id=myMsg>
-        <button type="button" onclick="addMyMsg()" id="sendMsg">Send</button>
+        <input id="m" autocomplete="off" />
+        <button onclick="sendMSG()" id="send">Send</button>
     </div>
-</div>
+  </div>
 
 </div>
-
+<script src="javascript/socket.io/socket.io.js"></script>
 <script>
-    function addMyMsg(){
-        if($('#myMsg').val() != "")
-        {
-                $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + $('#myMsg').val() + "</p></div>");
-        }
+  
+    var socket = io.connect('http://localhost:4200');
 
-        //TODO: Save the new message to the database
+    socket.emit('subscribe', "chickenball");
+
+    socket.on('message', function(msg){
+      $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + msg + "</p></div>");
+    });
+
+    function sendMSG(){
+        var data = {msg:$('#m').val(), room:"chickenball", user:"bla"};
+        socket.emit('message', data);
+        $('#m').val('');
+        return false;
     }
+ 
+   
+
 </script>
 
 </html>

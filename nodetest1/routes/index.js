@@ -12,6 +12,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 
 //Get db model
 var User = require('../models/user');
+var Chat = require('../models/chat');
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -144,6 +145,20 @@ io.on('connection', function(client){
         console.log("THE DATA IS EQUAL TO: ");
         console.log(data);
     });
+
+  client.on('subscribe', function(room){
+        console.log('Logging into room ', room);
+        client.join(room);
+        //TODO:load all messages from db
+  });
+
+  client.on('message', function(data){
+        console.log(data);
+        io.sockets.in(data.room).emit('message', data.msg);
+        //TODO: Save msg to db
+  });
+
+
 });
 
 http.listen(4200, function(){
