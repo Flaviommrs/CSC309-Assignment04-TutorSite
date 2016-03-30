@@ -78,6 +78,7 @@
     <script>
     //Converting form to JSON
     //Source: http://jsfiddle.net/sxGtM/3/ - http://stackoverflow.com/questions/1184624/convert-form-data-to-javascript-object-with-jquery
+
     $.fn.serializeObject = function()
     {
     var o = {};
@@ -114,8 +115,32 @@
                 nonCircularEvents.push(newEvent);
             }
 
-            myJSONObj = $('form').serializeObject();
-            myJSONObj.events = nonCircularEvents;
+            myJSONObj = $('#register').serializeObject();
+            var subjects = [
+                myJSONObj.math,
+                myJSONObj.physics,
+                myJSONObj.history,
+                myJSONObj.biology,
+                myJSONObj.geography,
+                myJSONObj.chemistry,
+                myJSONObj.english
+            ];
+            /*
+            function removeNulls(current) {
+              var newArray = new Array();
+              for (var i = 0; i < current.length; i++) {
+                if (actual[i]) {
+                  newArray.push(actual[i]);
+                }
+              }
+              return newArray;
+            };
+
+
+            subjects = removeNulls(subjects);
+            */
+            //myJSONObj.events = nonCircularEvents;
+            //myJSONObj.subjects = subjects;
 
             var socket = io.connect('http://localhost:4200');
             socket.on('connect', function(data) {
@@ -169,7 +194,7 @@
 <div class="content">
     <h1> Sign up to TutorMe </h1>
 
-    <form id='register'>
+    <form id="register">
         <fieldset>
             <legend>Register</legend>
                 <div id='register_labels'>
