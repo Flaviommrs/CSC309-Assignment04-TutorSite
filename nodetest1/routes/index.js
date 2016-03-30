@@ -1,5 +1,73 @@
 var express = require('express');
+
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 var router = express.Router();
+
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+//Get db model
+var User = require('../models/user');
+
+//DB TESTER PAGE
+router.get('/data', function(req, res, next) {
+    
+    //Find object with name Bruce Wayne
+    User.find({}, function(err, batman) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        res.render('index.html', {group: batman});
+    });
+});
+
+/* Test from html file input to server to database */
+router.post('/usernameTest', function(req, res, next){
+  console.dir(req.body.uname);
+  console.dir(req.body.pword);  
+  User.findOne({username: req.body.uname}, function(err, user) {
+
+    if (!user) {//Username not taken
+      var input_user = new User({name: req.body.uname, password: req.body.pword});
+
+      input_user.save(function(err, funct) {
+        console.dir("New User Saved.");
+      });
+    }
+      res.redirect('/data');
+  });
+});
+
+/* Test from html file input to server to database */
+router.post('/cleardb', function(req, res, next){
+  User.remove({}, function(err) { 
+    console.log('collection removed') 
+    res.redirect('/data');
+  });
+});
+
+/* Login Authentication */
+router.post('/LoginAuthentication', function(req, res, next){
+  var log_username = req.body.username;
+  var log_password = req.body.password;
+
+  console.dir(log_username);
+  console.dir(log_password);
+
+  //Find user in user database
+  User.findOne({username: log_username}, function(err, user) {
+    //Password matches and go through
+    if ((user) && (user.password == log_password)) {
+      console.dir("User found and password matches.");
+      res.redirect('/homepage');
+    }
+
+  });
+
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -60,6 +128,26 @@ router.get('/search', function(req, res, next) {
 /* GET weekview page. */
 router.get('/weekView', function(req, res, next) {
     res.render('weekview.html', {});
+});
+
+/* GET weekview page. */
+router.get('/registration', function(req, res, next) {
+    console.log("I just received the following data: ");
+    res.render('weekview.html', {});
+    //console.log(req.query.data);
+});
+
+io.on('connection', function(client){
+  console.log('a user connected');
+
+  client.on('register', function(data) {
+        console.log("THE DATA IS EQUAL TO: ");
+        console.log(data);
+    });
+});
+
+http.listen(4200, function(){
+  console.log('listening SOCKET on *:4200');
 });
 
 module.exports = router;
