@@ -15,7 +15,7 @@ var User = require('../models/user');
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
-    
+
     //Find object with name Bruce Wayne
     User.find({}, function(err, batman) {
         if (err) return console.error(err);
@@ -27,11 +27,11 @@ router.get('/data', function(req, res, next) {
 /* Test from html file input to server to database */
 router.post('/usernameTest', function(req, res, next){
   console.dir(req.body.uname);
-  console.dir(req.body.pword);  
+  console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
 
     if (!user) {//Username not taken
-      var input_user = new User({name: req.body.uname, password: req.body.pword});
+      var input_user = new User({username: req.body.uname, password: req.body.pword});
 
       input_user.save(function(err, funct) {
         console.dir("New User Saved.");
@@ -43,8 +43,8 @@ router.post('/usernameTest', function(req, res, next){
 
 /* Test from html file input to server to database */
 router.post('/cleardb', function(req, res, next){
-  User.remove({}, function(err) { 
-    console.log('collection removed') 
+  User.remove({}, function(err) {
+    console.log('collection removed')
     res.redirect('/data');
   });
 });
@@ -137,12 +137,77 @@ router.get('/registration', function(req, res, next) {
     //console.log(req.query.data);
 });
 
+function checkNewUserData(data)
+{
+    var toTest = [];
+    toTest.push(data["username"]);
+    toTest.push(data["password"]);
+    for (var i = 0; i < toTest.length; i++)
+    {
+        if(toTest[i])
+        {
+            if(toTest[i] == "")
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 io.on('connection', function(client){
   console.log('a user connected');
 
   client.on('register', function(data) {
+        data = JSON.parse(data);
         console.log("THE DATA IS EQUAL TO: ");
         console.log(data);
+
+        if(!checkNewUserData(data))
+        {
+            console.log("Invalid user data");
+            return;
+        }
+
+
+        User.findOne({username: data["username"]}, function(err, user) {
+
+          if (!user)
+          {//Username not taken
+            var tutorB = data["type_of_user"] == "Yes" ? true : false;
+            var adminB = false;
+            var freeTimesJSON = JSON.stringify(data["events"]);
+            var input_user = new User({name: data["name"], email: data["email"], username: data["username"], password: data["password"], tutor: tutorB, admin: adminB, subjects: data["subjects"], freeTimes: freeTimesJSON});
+            console.log("This is the input_user:");
+            console.log(input_user);
+            input_user.save(function(err, funct) {
+              console.dir("New User Saved.");
+            });
+          }
+        });
+
+        //REFERENCE ONLY
+        /*
+        console.dir(req.body.uname);
+        console.dir(req.body.pword);
+        User.findOne({username: req.body.uname}, function(err, user) {
+
+          if (!user) {//Username not taken
+            var input_user = new User({name: req.body.uname, password: req.body.pword});
+
+            input_user.save(function(err, funct) {
+              console.dir("New User Saved.");
+            });
+          }
+            res.redirect('/data');
+        });
+        */
+
+
     });
 });
 
