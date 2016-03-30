@@ -6,6 +6,35 @@ var io = require('socket.io')(http);
 
 var router = express.Router();
 
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+//Get db model
+var User = require('../models/user');
+
+//Create data for db
+var test_user = new User({
+  name: 'Bruce Wayne'
+});
+
+//Save to db
+test_user.save(function(err, thor) {
+  if (err) return console.error(err);
+  console.dir("User Saved.");
+});
+
+//DB TESTER PAGE
+router.get('/data', function(req, res, next) {
+    
+    //Find object with name Bruce Wayne
+    User.findOne({ name: 'Bruce Wayne' }, function(err, batman) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        res.render('index.html', {group: batman});
+    });
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('homepage_inital.html', {});
