@@ -3,8 +3,30 @@
 <!--Head Info-->
   <head>
     <link rel="stylesheet" type="text/css" href="/stylesheets/message_style.css">
-    <title>Tutor Me: Send message</title> 
+    <title>Tutor Me: Send message</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
+    <script src='javascript/lib/jquery.min.js'></script>
+
+    <script>
+
+    $(document).ready(function(){
+        function enterSubmit(e){
+          if(e.keyCode==13)
+          {
+            $('#sendMsg').click();
+            $('#myMsg').keypress(enterSubmit);
+            $('#myMsg').focus();
+            $('#messageBoard').animate({
+                scrollTop: $('#messageBoard').get(0).scrollHeight
+            }, 1500);
+            //$('#messageBoard').scrollTop($('#messageBoard').height());
+          }
+
+        }
+        $('#myMsg').keypress(enterSubmit);
+});
+
+    </script>
   </head>
 
 <!-- Header bar -->
@@ -22,22 +44,29 @@
 <button class="user">John Smith</button>
 </div>
 
-<div class="prev_msg"> 
+<div class="prev_msg" id=messageBoard>
   <div class="msg1">
   <p>Hi, I would like to hire you as my tutor! </p>
-  </div> 
+  </div>
 
-  <div class="msg2" align="right">
-  <p> Great! It would be a pleasure teaching you. </p>
-  </div> 
-
-  <div class="send_msg"> 
-    <form action="/message" class="send">
-        <input type="text" placeholder="Write Message" required="">
-        <button type="submit">Send</button>
-    </form>
-</div>
+  <div class="send_msg">
+    <div class="send">
+        <input type="text" placeholder="Write Message" required="" id=myMsg>
+        <button type="button" onclick="addMyMsg()" id="sendMsg">Send</button>
+    </div>
 </div>
 
+</div>
+
+<script>
+    function addMyMsg(){
+        if($('#myMsg').val() != "")
+        {
+                $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + $('#myMsg').val() + "</p></div>");
+        }
+
+        //TODO: Save the new message to the database
+    }
+</script>
 
 </html>
