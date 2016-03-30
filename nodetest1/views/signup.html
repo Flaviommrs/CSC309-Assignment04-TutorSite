@@ -5,7 +5,7 @@
     <meta charset='utf-8' />
     <link rel='stylesheet' href='javascript/lib/cupertino/jquery-ui.min.css' />
     <link rel='stylesheet' href='javascript/fullcalendar/fullcalendar.css' />
-    <link href='fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
+    <link href='javascript/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
     <script src='javascript/lib/jquery.min.js'></script>
     <script src='javascript/lib/moment.min.js'></script>
     <script src='javascript/fullcalendar/fullcalendar.js'></script>
@@ -15,6 +15,7 @@
     <title>Tutor Me - Registration Page</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
+    <script src="javascript/socket.io/socket.io.js"></script>
     <script>
 
     $(document).ready(function() {
@@ -116,22 +117,10 @@
             myJSONObj = $('form').serializeObject();
             myJSONObj.events = nonCircularEvents;
 
-            //TODO: SUBMIT THE FORM INSTEAD OF ALERTING
-            alert(JSON.stringify(myJSONObj));
-
-            // Sending and receiving data in JSON format using POST method
-            xhr = new XMLHttpRequest();
-            var url = "http://127.0.0.1:3000/registration?data=" + encodeURIComponent(JSON.stringify(myJSONObj));
-            xhr.open("GET", url, true);
-            xhr.setRequestHeader("Content-type", "application/json");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var serverResponse = xhr.responseText;
-                    //TODO: Check according to the response if the
-                    //data was successfully saved to the DB
-                }
-            }
-            xhr.send();
+            var socket = io.connect('http://localhost:4200');
+            socket.on('connect', function(data) {
+                socket.emit('register', JSON.stringify(myJSONObj));
+            });
 
             return false;
         });
