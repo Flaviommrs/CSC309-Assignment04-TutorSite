@@ -17,7 +17,6 @@ var Chat = require('../models/chat');
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
 
-    //Find object with name Bruce Wayne
     User.find({}, function(err, batman) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
@@ -30,7 +29,7 @@ router.post('/usernameTest', function(req, res, next){
   console.dir(req.body.uname);
   console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
-
+  console.dir("Inside find.");
     if (!user) {//Username not taken
       var input_user = new User({username: req.body.uname, password: req.body.pword});
 
@@ -67,9 +66,17 @@ router.post('/LoginAuthentication', function(req, res, next){
   //Find user in user database
   User.findOne({username: log_username}, function(err, user) {
     //Password matches and go through
-    if ((user) && (user.password == log_password)) {
-      console.dir("User found and password matches.");
-      res.redirect('/homepage');
+    if (user == null){ //user not found
+      console.dir('user not found')
+      res.redirect('/data');
+    } else {
+      //Password matches and go through
+      if (user.password == log_password) {
+        console.dir("User found and password matches.");
+        res.redirect('/homepage');
+      } else {
+        res.redirect('/data');
+      }
     }
 
   });
@@ -127,9 +134,30 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
+/* POST search page - find user. */
+var searchedTerm = null;
+
+/* Search Results - search usernames */
+router.post('/searchFind', function(req, res, next){
+  searchedTerm = req.body.search;
+  console.dir(searchedTerm);
+
+  //Find user based on username
+  User.findOne({username: searchedTerm}, function(err, user) {
+    //Password matches and go through
+    if (user == null){ //user not found
+      console.dir('user not found')
+      res.redirect('/searchFind2');
+    } else {
+        console.dir("User found");
+        res.redirect('/profile');
+    }
+  });
+})
+
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-    res.render('search.html', {});
+    res.render('search.html', {search: searchedTerm});
 });
 
 /* GET weekview page. */

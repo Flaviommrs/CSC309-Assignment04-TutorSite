@@ -14,25 +14,27 @@
 		<div class="header">
 			<a href="/"><img  id="logo" src="images/logo.png" alt="Logo"></a>		</div>
 		<div class="search_container">
-			<form action="/search" class="search-wrapper cf">
-		        <input type="text" placeholder="Search..." required="">
+			<form action="/searchFind" method='post' class="search-wrapper cf">
+		        <input type="text" name='search' placeholder="Search..." required="">
 		        <button type="submit">Search</button>
 		    </form>
 		</div>
 
+		<!--
 		<div class="search_box">
 
-			<form action="/search" class="search-main">
+			<form action="/searchFind" method='post' class="search-main">
 				<input type="text" placeholder="Search..." required="">
 				<button type="submit">Search</button>
 			</form>
 
 		</div>
+		-->
 
 		<div>
 
 			<p>
-				Results From your Search 
+				Results From your Search: <%=search %>
 			</p>
 
 		</div>
