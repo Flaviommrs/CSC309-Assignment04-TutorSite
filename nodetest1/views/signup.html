@@ -110,6 +110,8 @@
 
     $(function() {
         $('form').submit(function() {
+
+            /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
             var myEvents = $('#calendar').fullCalendar('clientEvents');
 
@@ -127,7 +129,10 @@
                 nonCircularEvents.push(newEvent);
             }
 
+            /** PARSING OF THE FORM FIELDS (FILE EXCLUDED) **/
             myJSONObj = $('#register').serializeObject();
+
+            /** PARSING OF THE SUBJECTS **/
             var subjects = [
                 myJSONObj.math,
                 myJSONObj.physics,
@@ -137,15 +142,44 @@
                 myJSONObj.chemistry,
                 myJSONObj.english
             ];
-
-
             subjects = removeNulls(subjects);
+
+            /** PARSING OF THE PROFILE PICTURE **/
+            //NOT WORKING
+            var input = $('#profile_pic');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    alert(e.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+
+
+
             myJSONObj.events = nonCircularEvents;
             myJSONObj.subjects = subjects;
 
+            /** PARSING OF THE EVENTS **/
             var socket = io.connect('http://localhost:4200');
             socket.on('connect', function(data) {
                 socket.emit('register', JSON.stringify(myJSONObj));
+                socket.on('failedDB', function(data) {
+                    alert("Some unexpected problem happened on saving your data. Please try again.");
+                });
+                socket.on('invalidData', function(data) {
+                    //Do nothing
+                    alert("Invalid Data. Please verify your data and try again.");
+                });
+                socket.on('duplicatedUsername', function(data) {
+                    //Do nothing
+                    alert("Please select another username.");
+                });
+                socket.on('success', function(data) {
+                    alert("Thank you for registering. Please login now.");
+                    window.location.href = '/';
+                });
             });
 
             return false;

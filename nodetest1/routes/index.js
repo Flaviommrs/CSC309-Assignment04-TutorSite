@@ -177,6 +177,7 @@ io.on('connection', function(client){
         if(!checkNewUserData(data))
         {
             console.log("Invalid user data");
+            client.emit('invalidData', "-1");
             return;
         }
 
@@ -193,11 +194,17 @@ io.on('connection', function(client){
             input_user.save(function(err, funct) {
                 if(!err){
                     console.dir("New User Saved.");
+                    client.emit('success', "0");
                 } else {
                     console.dir("Failed to save user: ");
                     console.dir(err);
+                    client.emit('failedDB', "-1");
                 }
             });
+          }
+          else
+          {
+              client.emit('duplicatedUsername', "-1");
           }
         });
     });
