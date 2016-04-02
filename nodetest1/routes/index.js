@@ -1,4 +1,6 @@
 var express = require('express');
+var cookieParser = require('cookie-parser');
+var cookieSign = require('cookie-signature');
 
 var app = require('express')();
 var http = require('http').Server(app);
@@ -12,11 +14,11 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 
 //Get db model
 var User = require('../models/user');
+var Chat = require('../models/chat');
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
-    
-    //Find object with name Bruce Wayne
+
     User.find({}, function(err, batman) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
@@ -24,17 +26,43 @@ router.get('/data', function(req, res, next) {
     });
 });
 
+//COOKIE TESTER PAGE
+router.get('/cookiesignread', function(req, res, next) {
+    console.dir(cookieSign.unsign(req.cookies.testingSign, 'tobiiscool'));
+    res.redirect('/');
+});
+//COOKIE TESTER PAGE
+router.get('/cookiesign', function(req, res, next) {
+    var val = cookieSign.sign('hello', 'tobiiscool');
+    res.clearCookie('testingSign');
+    res.cookie('testingSign' , val, {expire : new Date() + 9999}).send('Cookie is set');
+});
+
+
+//COOKIE TESTER PAGE
+router.get('/cookie', function(req, res, next) {
+    res.clearCookie('tutorMeData');
+    res.clearCookie('MyCookie');
+    res.cookie('MyCookie' , 'cookie_value123', {expire : new Date() + 9999}).send('Cookie is set');
+});
+
 /* Test from html file input to server to database */
 router.post('/usernameTest', function(req, res, next){
   console.dir(req.body.uname);
-  console.dir(req.body.pword);  
+  console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
-
+  console.dir("Inside find.");
     if (!user) {//Username not taken
-      var input_user = new User({name: req.body.uname, password: req.body.pword});
+      var input_user = new User({name: req.body.realname, username: req.body.uname, password: req.body.pword});
 
       input_user.save(function(err, funct) {
-        console.dir("New User Saved.");
+        if(!err){
+            console.dir("New User Saved.");
+        } else {
+            console.dir("Failed to save user: ");
+            console.dir(err);
+        }
+
       });
     }
       res.redirect('/data');
@@ -43,8 +71,8 @@ router.post('/usernameTest', function(req, res, next){
 
 /* Test from html file input to server to database */
 router.post('/cleardb', function(req, res, next){
-  User.remove({}, function(err) { 
-    console.log('collection removed') 
+  User.remove({}, function(err) {
+    console.log('collection removed')
     res.redirect('/data');
   });
 });
@@ -60,9 +88,25 @@ router.post('/LoginAuthentication', function(req, res, next){
   //Find user in user database
   User.findOne({username: log_username}, function(err, user) {
     //Password matches and go through
-    if ((user) && (user.password == log_password)) {
-      console.dir("User found and password matches.");
-      res.redirect('/homepage');
+    if (user == null){ //user not found
+      console.dir('user not found')
+      res.redirect('/data');
+    } else {
+      //Password matches and go through
+      if (user.password == log_password) {
+        console.dir("User found and password matches.");
+        //SAVE THE COOKIE
+        //var userData = {username: user.username};
+        //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
+        var secret = 'tutorMeSecretString';
+        var val = cookieSign.sign(user.username, secret);
+        res.clearCookie('tutorMeData');
+        res.cookie('tutorMeData' , val, {expire : new Date() + 9999});
+
+        res.redirect('/homepage');
+      } else {
+        res.redirect('/data');
+      }
     }
 
   });
@@ -91,7 +135,28 @@ router.get('/facebookLog', function(req, res, next) {
 
 /* GET user homepage page. */
 router.get('/homepage', function(req, res, next) {
-    res.render('homepage_user.html', {});
+    var secret = 'tutorMeSecretString';
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    console.dir(result);
+    if(result)
+    {
+        res.render('homepage_user.html', {});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
+
+    /* NO SECURITY VERSION
+    if(req.cookies.tutorMeData)
+    {
+        res.render('homepage_user.html', {});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
+    */
 });
 
 /* GET inbox page. */
@@ -107,7 +172,16 @@ router.get('/links', function(req, res, next) {
 
 /* GET message page. */
 router.get('/message', function(req, res, next) {
-    res.render('message.html', {});
+    var secret = 'tutorMeSecretString';
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        res.render('message.html', {userNameReceived: result});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
 });
 
 /* GET profile page. */
@@ -120,9 +194,55 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
+/* POST search page - find user. */
+var searchedTerm = null;
+var searchResults = null;
+
+/* Search Results - search usernames */
+router.post('/searchFind', function(req, res, next){
+  searchedTerm = req.body.search;
+  console.dir(searchedTerm);
+
+  //Find user based on username - should result in one user
+  User.findOne({username: searchedTerm}, function(err, user) {
+    if (user == null){ //username not found
+      console.dir("User not found - searching names");
+
+        //Find the real name of the user
+        User.find ({name: searchedTerm}, function(err, users) {
+          if (users.length == 0) {
+            console.dir("Users not found");
+            res.redirect('/data');
+          } else {
+            console.dir("Users found");
+            console.dir(users);
+            searchResults = users;
+            res.redirect("/search");
+          }
+        });
+
+    } else {
+        console.dir("User found");
+        searchResults = user;
+        res.redirect('/profile');
+    }
+  });
+})
+
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-    res.render('search.html', {});
+  /* Filter multiple user results */
+  if (searchResults != null){
+    var foundNames = [];
+    var foundUsernames = [];
+
+    for (i in searchResults) {
+      console.dir(searchResults[i].name);
+      foundNames.push(searchResults[i].name);
+      foundUsernames.push(searchResults[i].username);
+    }
+  }
+    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
 });
 
 /* GET weekview page. */
@@ -137,13 +257,177 @@ router.get('/registration', function(req, res, next) {
     //console.log(req.query.data);
 });
 
+function checkNewUserData(data)
+{
+    var toTest = [];
+    toTest.push(data["username"]);
+    toTest.push(data["password"]);
+    for (var i = 0; i < toTest.length; i++)
+    {
+        if(toTest[i])
+        {
+            if(toTest[i] == "")
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 io.on('connection', function(client){
   console.log('a user connected');
 
   client.on('register', function(data) {
+        data = JSON.parse(data);
         console.log("THE DATA IS EQUAL TO: ");
         console.log(data);
+
+        if(!checkNewUserData(data))
+        {
+            console.log("Invalid user data");
+            client.emit('invalidData', "-1");
+            return;
+        }
+
+        User.findOne({username: data["username"]}, function(err, user) {
+
+          if (!user)
+          {//Username not taken
+            var tutorB = data["type_of_user"] == "Yes" ? true : false;
+            var adminB = false;
+            var freeTimesJSON = JSON.stringify(data["events"]);
+            var input_user = new User({name: data["name"], email: data["email"], username: data["username"], password: data["password"], tutor: tutorB, admin: adminB, subjects: data["subjects"], freeTimes: freeTimesJSON});
+            console.log("This is the input_user:");
+            console.log(input_user);
+            input_user.save(function(err, funct) {
+                if(!err){
+                    console.dir("New User Saved.");
+                    client.emit('success', "0");
+                } else {
+                    console.dir("Failed to save user: ");
+                    console.dir(err);
+                    client.emit('failedDB', "-1");
+                }
+            });
+          }
+          else
+          {
+              client.emit('duplicatedUsername', "-1");
+          }
+        });
     });
+
+
+  client.on('subscribe', function(data){
+
+    User.findOne({username: data.user}, function(err, user) {
+
+      if (!user) {//Username not taken
+
+        console.log("no user with that name");
+
+      }else{
+
+        var room = 0;
+
+        var chats = user.chats;
+
+        var index = -1;
+
+        for (var i = 0; i < chats.length; i++){
+          if(chats[i].user == data.receiver){
+            index = i;
+          }
+        }
+
+        console.log("index",index)
+
+        if(index < 0){
+
+          Chat.count(function(err, c){
+
+            room = c;
+
+          });
+          var messages = [];
+
+          //creates a new room for the conversation
+          var chatRoom = new Chat({roomName: room, messages:messages});
+          chatRoom.save(function(err, funct) {
+            console.dir("New room Saved.");
+          });
+
+          var userChats = chats.slice(0);
+          var chatUser = {room:room, user: data.receiver};
+
+          userChats.push(chatUser);
+
+          user.chats = userChats;
+
+          user.save();
+
+          User.findOne({username: data.receiver}, function(err, receiver){
+
+            var reChats = receiver.chats.slice(0);
+
+            var chatReceiver = {room:room, user: data.user};
+
+            reChats.push(chatReceiver);
+
+            receiver.chats = reChats;
+
+            receiver.save();
+
+          });
+
+          console.log(data.user, ' logging into room ', room);
+          client.join(room);
+
+        }else{
+          room = chats[index].room;
+
+          console.log(data.user, ' logging into room ', room);
+          client.join(room);
+
+        }
+
+        Chat.findOne({roomName: room}, function(err, chatRoom){
+
+          if(chatRoom){
+
+            var log = {room: room, log:chatRoom.messages};
+
+            client.emit('message log', log);
+          }
+
+        });
+
+      }
+    });
+
+  });
+
+  client.on('message', function(data){
+        console.log(data);
+        io.sockets.in(data.room).emit('message', data);
+
+        Chat.findOne({roomName: data.room}, function(err, chat){
+
+          var addMsg = chat.messages.slice(0);
+          var newMessage = {msg:data.msg, sender:data.sender}
+          addMsg.push(newMessage);
+          chat.messages = addMsg;
+          chat.save();
+
+        })
+  });
+
+
 });
 
 http.listen(4200, function(){

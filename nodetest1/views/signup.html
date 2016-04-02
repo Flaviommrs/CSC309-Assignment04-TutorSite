@@ -16,7 +16,19 @@
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
     <script src="javascript/socket.io/socket.io.js"></script>
+
     <script>
+
+    function showSubjects()
+    {
+        if(document.getElementById('type_of_user').checked)
+        {
+                $('#subjects').css('visibility', 'visible');
+        }
+        else {
+                $('#subjects').css('visibility', 'hidden');
+        }
+    }
 
     $(document).ready(function() {
 
@@ -78,6 +90,7 @@
     <script>
     //Converting form to JSON
     //Source: http://jsfiddle.net/sxGtM/3/ - http://stackoverflow.com/questions/1184624/convert-form-data-to-javascript-object-with-jquery
+
     $.fn.serializeObject = function()
     {
     var o = {};
@@ -95,8 +108,23 @@
     return o;
     };
 
+    function removeNulls(current)
+    {
+      var newArray = new Array();
+      for (var i = 0; i < current.length; i++) {
+        if (current[i]) {
+          newArray.push(current[i]);
+        }
+      }
+      return newArray;
+    }
+
     $(function() {
         $('form').submit(function() {
+
+            checkAllForms();
+
+            /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
             var myEvents = $('#calendar').fullCalendar('clientEvents');
 
@@ -114,46 +142,62 @@
                 nonCircularEvents.push(newEvent);
             }
 
-            myJSONObj = $('form').serializeObject();
-            myJSONObj.events = nonCircularEvents;
+            /** PARSING OF THE FORM FIELDS (FILE EXCLUDED) **/
+            myJSONObj = $('#register').serializeObject();
 
+            /** PARSING OF THE SUBJECTS **/
+            var subjects = [
+                myJSONObj.math,
+                myJSONObj.physics,
+                myJSONObj.history,
+                myJSONObj.biology,
+                myJSONObj.geography,
+                myJSONObj.chemistry,
+                myJSONObj.english
+            ];
+            subjects = removeNulls(subjects);
+
+            /** PARSING OF THE PROFILE PICTURE **/
+            //NOT WORKING
+            var input = $('#profile_pic');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    alert(e.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+
+
+
+            myJSONObj.events = nonCircularEvents;
+            myJSONObj.subjects = subjects;
+
+            /** PARSING OF THE EVENTS **/
             var socket = io.connect('http://localhost:4200');
             socket.on('connect', function(data) {
                 socket.emit('register', JSON.stringify(myJSONObj));
+                socket.on('failedDB', function(data) {
+                    alert("Some unexpected problem happened on saving your data. Please try again.");
+                });
+                socket.on('invalidData', function(data) {
+                    //Do nothing
+                    alert("Invalid Data. Please verify your data and try again.");
+                });
+                socket.on('duplicatedUsername', function(data) {
+                    //Do nothing
+                    alert("Please select another username.");
+                });
+                socket.on('success', function(data) {
+                    alert("Thank you for registering. Please login now.");
+                    window.location.href = '/';
+                });
             });
 
             return false;
         });
     });
-
-    //Unused function - experimenting with JS and MongoDB here
-    /*
-    function sendForm(inputJSON)
-    {
-        var myEvents = getEvents();
-        var MongoClient = require('mongodb').MongoClient;
-
-        alert("Will connect");
-        //Mongo
-        // Connect to the db
-        MongoClient.connect("mongodb://localhost:27017/newDB", function(err, db) {
-          if(err) { return console.dir(err); }
-          else { alert("connected"); }
-
-          var collection = db.collection('test');
-          var doc1 = {'hello':'doc1'};
-          var doc2 = {'hello':'doc2'};
-          var lotsOfDocs = [{'hello':'doc3'}, {'hello':'doc4'}];
-
-          collection.insert(doc1);
-
-          collection.insert(doc2, {w:1}, function(err, result) {});
-
-          collection.insert(lotsOfDocs, {w:1}, function(err, result) {});
-
-        });
-    }
-    */
     </script>
 
   </head>
@@ -169,7 +213,7 @@
 <div class="content">
     <h1> Sign up to TutorMe </h1>
 
-    <form id='register'>
+    <form id="register">
         <fieldset>
             <legend>Register</legend>
                 <div id='register_labels'>
@@ -187,20 +231,20 @@
                     <br/>
                 </div>
                 <div id='register_inputs'>
-                    <input type='text' name='name' id='name' maxlength="50" size="25" />
+                    <input type='text' name='name' id='name' maxlength="50" size="25" required/>
                     <br/>
-                    <input type='text' name='email' id='email' maxlength="50" size="25"  />
+                    <input type='text' name='email' id='email' maxlength="50" size="25"  required/>
                     <br/>
-                    <input type='text' name='username' id='username' maxlength="20" size="25" />
+                    <input type='text' name='username' id='username' maxlength="20" size="25" required/>
                     <br/>
-                    <input type='password' name='password' id='password' maxlength="25" size="25" />
+                    <input type='password' name='password' id='password' maxlength="25" size="25" required/>
                     <br/>
-                    <input type='checkbox' name='type_of_user' id='type_of_user' value="Yes"/>
+                    <input type='checkbox' name='type_of_user' id='type_of_user' value="Yes"/ onchange="showSubjects()">
                     <br/>
                     <input type='file' name='profile_pic' id='profile_pic' accept="image/*" capture/>
                     <br/>
                 </div>
-                <fieldset display='none' class="subjects">
+                <fieldset style="visibility: hidden" class="subjects" id="subjects">
                     <legend>Subjects I want to teach</legend>
                         <table>
                         <tr>
