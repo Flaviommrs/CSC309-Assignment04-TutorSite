@@ -63,16 +63,34 @@
 <script src="javascript/socket.io/socket.io.js"></script>
 <script>
   
+    var room = -1;
     var socket = io.connect('http://localhost:4200');
 
-    socket.emit('subscribe', "chickenball");
+    chatData = {user:"Dummy", receiver:"Dummy2"}
 
-    socket.on('message', function(msg){
-      $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + msg + "</p></div>");
+    socket.emit('subscribe', chatData);
+
+    socket.on('message', function(data){
+
+      $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + data.msg + "</p></div>");
+    });
+
+    socket.on('message log', function(data){
+
+      room = data.room;
+      var log = data.log;
+
+      for(var i = 0; i < log.length; i++){
+
+        $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + log[i].msg + "</p></div>");
+
+      }
+
+
     });
 
     function sendMSG(){
-        var data = {msg:$('#m').val(), room:"chickenball", user:"bla"};
+        var data = {msg:$('#m').val(), room:room, sender:"Dummy"};
         socket.emit('message', data);
         $('#m').val('');
         return false;

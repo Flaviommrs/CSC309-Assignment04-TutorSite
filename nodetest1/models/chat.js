@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
 
 var chatSchema = new mongoose.Schema({
-  roomName: Number,
-  messages: [String]
+
+  roomName: {type: Number, unique: true},
+  messages: [{msg:String, sender:String}]
 
 });
 
