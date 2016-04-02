@@ -17,7 +17,6 @@ var Chat = require('../models/chat');
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
 
-    //Find object with name Bruce Wayne
     User.find({}, function(err, batman) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
@@ -30,12 +29,18 @@ router.post('/usernameTest', function(req, res, next){
   console.dir(req.body.uname);
   console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
-
+  console.dir("Inside find.");
     if (!user) {//Username not taken
-      var input_user = new User({username: req.body.uname, password: req.body.pword});
+      var input_user = new User({name: req.body.realname, username: req.body.uname, password: req.body.pword});
 
       input_user.save(function(err, funct) {
-        console.dir("New User Saved.");
+        if(!err){
+            console.dir("New User Saved.");
+        } else {
+            console.dir("Failed to save user: ");
+            console.dir(err);
+        }
+
       });
     }
       res.redirect('/data');
@@ -61,9 +66,17 @@ router.post('/LoginAuthentication', function(req, res, next){
   //Find user in user database
   User.findOne({username: log_username}, function(err, user) {
     //Password matches and go through
-    if ((user) && (user.password == log_password)) {
-      console.dir("User found and password matches.");
-      res.redirect('/homepage');
+    if (user == null){ //user not found
+      console.dir('user not found')
+      res.redirect('/data');
+    } else {
+      //Password matches and go through
+      if (user.password == log_password) {
+        console.dir("User found and password matches.");
+        res.redirect('/homepage');
+      } else {
+        res.redirect('/data');
+      }
     }
 
   });
@@ -121,9 +134,55 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
+/* POST search page - find user. */
+var searchedTerm = null;
+var searchResults = null;
+
+/* Search Results - search usernames */
+router.post('/searchFind', function(req, res, next){
+  searchedTerm = req.body.search;
+  console.dir(searchedTerm);
+
+  //Find user based on username - should result in one user
+  User.findOne({username: searchedTerm}, function(err, user) {
+    if (user == null){ //username not found
+      console.dir("User not found - searching names");
+
+        //Find the real name of the user
+        User.find ({name: searchedTerm}, function(err, users) {
+          if (users.length == 0) {
+            console.dir("Users not found");
+            res.redirect('/data');
+          } else {
+            console.dir("Users found");
+            console.dir(users);
+            searchResults = users;
+            res.redirect("/search");
+          }
+        });
+
+    } else {
+        console.dir("User found");
+        searchResults = user;
+        res.redirect('/profile');
+    }
+  });
+})
+
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-    res.render('search.html', {});
+  /* Filter multiple user results */
+  if (searchResults != null){
+    var foundNames = [];
+    var foundUsernames = [];
+
+    for (i in searchResults) {
+      console.dir(searchResults[i].name);
+      foundNames.push(searchResults[i].name);
+      foundUsernames.push(searchResults[i].username);
+    }
+  }
+    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
 });
 
 /* GET weekview page. */
@@ -171,9 +230,9 @@ io.on('connection', function(client){
         if(!checkNewUserData(data))
         {
             console.log("Invalid user data");
+            client.emit('invalidData', "-1");
             return;
         }
-
 
         User.findOne({username: data["username"]}, function(err, user) {
 
@@ -186,29 +245,21 @@ io.on('connection', function(client){
             console.log("This is the input_user:");
             console.log(input_user);
             input_user.save(function(err, funct) {
-              console.dir("New User Saved.");
+                if(!err){
+                    console.dir("New User Saved.");
+                    client.emit('success', "0");
+                } else {
+                    console.dir("Failed to save user: ");
+                    console.dir(err);
+                    client.emit('failedDB', "-1");
+                }
             });
           }
-        });
-
-        //REFERENCE ONLY
-        /*
-        console.dir(req.body.uname);
-        console.dir(req.body.pword);
-        User.findOne({username: req.body.uname}, function(err, user) {
-
-          if (!user) {//Username not taken
-            var input_user = new User({name: req.body.uname, password: req.body.pword});
-
-            input_user.save(function(err, funct) {
-              console.dir("New User Saved.");
-            });
+          else
+          {
+              client.emit('duplicatedUsername', "-1");
           }
-            res.redirect('/data');
         });
-        */
-
-
     });
 
   
