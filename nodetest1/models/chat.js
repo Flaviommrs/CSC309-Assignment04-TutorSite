@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var chatSchema = new mongoose.Schema({
-  roomName: int,
+  roomName: Number,
   messages: [String]
 
 });
