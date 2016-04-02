@@ -31,7 +31,7 @@ router.post('/usernameTest', function(req, res, next){
   User.findOne({username: req.body.uname}, function(err, user) {
   console.dir("Inside find.");
     if (!user) {//Username not taken
-      var input_user = new User({username: req.body.uname, password: req.body.pword});
+      var input_user = new User({name: req.body.realname, username: req.body.uname, password: req.body.pword});
 
       input_user.save(function(err, funct) {
         if(!err){
@@ -136,6 +136,7 @@ router.get('/review', function(req, res, next) {
 
 /* POST search page - find user. */
 var searchedTerm = null;
+var searchResults = null;
 
 /* Search Results - search usernames */
 router.post('/searchFind', function(req, res, next){
@@ -144,21 +145,25 @@ router.post('/searchFind', function(req, res, next){
 
   //Find user based on username - should result in one user
   User.findOne({username: searchedTerm}, function(err, user) {
-    if (user == null){ //user not found
-
+    if (user == null){ //username not found
       console.dir("User not found - searching names");
+
+        //Find the real name of the user
         User.find ({name: searchedTerm}, function(err, users) {
           if (users.length == 0) {
             console.dir("Users not found");
             res.redirect('/data');
           } else {
             console.dir("Users found");
+            console.dir(users);
+            searchResults = users;
             res.redirect("/search");
           }
         });
 
     } else {
         console.dir("User found");
+        searchResults = user;
         res.redirect('/profile');
     }
   });
@@ -166,7 +171,16 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-    res.render('search.html', {search: searchedTerm});
+  /* Filter multiple user results */
+  var foundNames = [];
+  var foundUsernames = [];
+
+  for (i in searchResults) {
+    console.dir(searchResults[i].name);
+    foundNames.push(searchResults[i].name);
+    foundUsernames.push(searchResults[i].username);
+  }
+    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
 });
 
 /* GET weekview page. */
