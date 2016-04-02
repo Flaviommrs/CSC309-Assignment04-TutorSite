@@ -1,4 +1,6 @@
 var express = require('express');
+var cookieParser = require('cookie-parser');
+var cookieSign = require('cookie-signature');
 
 var app = require('express')();
 var http = require('http').Server(app);
@@ -22,6 +24,26 @@ router.get('/data', function(req, res, next) {
         console.dir("Retrived file from db.");
         res.render('index.html', {group: batman});
     });
+});
+
+//COOKIE TESTER PAGE
+router.get('/cookiesignread', function(req, res, next) {
+    console.dir(cookieSign.unsign(req.cookies.testingSign, 'tobiiscool'));
+    res.redirect('/');
+});
+//COOKIE TESTER PAGE
+router.get('/cookiesign', function(req, res, next) {
+    var val = cookieSign.sign('hello', 'tobiiscool');
+    res.clearCookie('testingSign');
+    res.cookie('testingSign' , val, {expire : new Date() + 9999}).send('Cookie is set');
+});
+
+
+//COOKIE TESTER PAGE
+router.get('/cookie', function(req, res, next) {
+    res.clearCookie('tutorMeData');
+    res.clearCookie('MyCookie');
+    res.cookie('MyCookie' , 'cookie_value123', {expire : new Date() + 9999}).send('Cookie is set');
 });
 
 /* Test from html file input to server to database */
@@ -73,6 +95,14 @@ router.post('/LoginAuthentication', function(req, res, next){
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
+        //SAVE THE COOKIE
+        //var userData = {username: user.username};
+        //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
+        var secret = 'tutorMeSecretString';
+        var val = cookieSign.sign(user.username, secret);
+        res.clearCookie('tutorMeData');
+        res.cookie('tutorMeData' , val, {expire : new Date() + 9999});
+
         res.redirect('/homepage');
       } else {
         res.redirect('/data');
@@ -105,7 +135,28 @@ router.get('/facebookLog', function(req, res, next) {
 
 /* GET user homepage page. */
 router.get('/homepage', function(req, res, next) {
-    res.render('homepage_user.html', {});
+    var secret = 'tutorMeSecretString2';
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    console.dir(result);
+    if(result)
+    {
+        res.render('homepage_user.html', {});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
+
+    /* NO SECURITY VERSION
+    if(req.cookies.tutorMeData)
+    {
+        res.render('homepage_user.html', {});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
+    */
 });
 
 /* GET inbox page. */
