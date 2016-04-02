@@ -1,7 +1,7 @@
 function loadUser(username) {
-    var request = $.ajax({ 
+    var request = $.ajax({
         method: "GET",
-        url: "http://127.0.0.1:3000/username=" + username
+        url: "/username=" + username
     });
 
     request.done(function(msg) {
@@ -14,12 +14,16 @@ function loadUser(username) {
         document.getElementById("rating").innerHTML = "Overall Rating: " + Number(json["sum_rating"]/json["rating_count"]).toFixed(2);
         document.getElementById("phone").innerHTML = "Phone Number: " + json["phone"];
         document.getElementById("email").innerHTML = "Email: " + json["email"];
-        document.getElementById("location").innerHTML = "Location: " + json["location"]["city"] + ", " + json["location"]["country"];
-        var string = " ";
-        for (var sub in json["subjects"]) {
-            string += sub + ","
+        if(json["location"])
+        {
+            document.getElementById("location").innerHTML = "Location: " + json["location"]["city"] + ", " + json["location"]["country"];
         }
-        document.getElementById("tutoring").innerHTML = "Tutoring:" + string.substring(0,length(string)-1);
+        else
+        {
+            document.getElementById("location").innerHTML = "Location: Unknown";
+        }
+
+        document.getElementById("tutoring").innerHTML = "Tutoring: " + json["subjects"];
         document.getElementById("rate").innerHTML = "Base Rate Per Hour: " + json["rate"];
     });
     request.fail(function( jqXHR, textStatus ) {
