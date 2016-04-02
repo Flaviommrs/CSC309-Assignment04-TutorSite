@@ -180,7 +180,6 @@ io.on('connection', function(client){
             return;
         }
 
-
         User.findOne({username: data["username"]}, function(err, user) {
 
           if (!user)
@@ -201,25 +200,6 @@ io.on('connection', function(client){
             });
           }
         });
-
-        //REFERENCE ONLY
-        /*
-        console.dir(req.body.uname);
-        console.dir(req.body.pword);
-        User.findOne({username: req.body.uname}, function(err, user) {
-
-          if (!user) {//Username not taken
-            var input_user = new User({name: req.body.uname, password: req.body.pword});
-
-            input_user.save(function(err, funct) {
-              console.dir("New User Saved.");
-            });
-          }
-            res.redirect('/data');
-        });
-        */
-
-
     });
 
   client.on('subscribe', function(room){

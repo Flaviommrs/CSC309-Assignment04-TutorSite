@@ -16,6 +16,7 @@
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
     <script src="javascript/socket.io/socket.io.js"></script>
+
     <script>
 
     $(document).ready(function() {
@@ -96,6 +97,17 @@
     return o;
     };
 
+    function removeNulls(current)
+    {
+      var newArray = new Array();
+      for (var i = 0; i < current.length; i++) {
+        if (current[i]) {
+          newArray.push(current[i]);
+        }
+      }
+      return newArray;
+    }
+
     $(function() {
         $('form').submit(function() {
             var TWO_HOURS = 7200;
@@ -125,22 +137,11 @@
                 myJSONObj.chemistry,
                 myJSONObj.english
             ];
-            /*
-            function removeNulls(current) {
-              var newArray = new Array();
-              for (var i = 0; i < current.length; i++) {
-                if (actual[i]) {
-                  newArray.push(actual[i]);
-                }
-              }
-              return newArray;
-            };
 
 
             subjects = removeNulls(subjects);
-            */
-            //myJSONObj.events = nonCircularEvents;
-            //myJSONObj.subjects = subjects;
+            myJSONObj.events = nonCircularEvents;
+            myJSONObj.subjects = subjects;
 
             var socket = io.connect('http://localhost:4200');
             socket.on('connect', function(data) {
@@ -150,35 +151,6 @@
             return false;
         });
     });
-
-    //Unused function - experimenting with JS and MongoDB here
-    /*
-    function sendForm(inputJSON)
-    {
-        var myEvents = getEvents();
-        var MongoClient = require('mongodb').MongoClient;
-
-        alert("Will connect");
-        //Mongo
-        // Connect to the db
-        MongoClient.connect("mongodb://localhost:27017/newDB", function(err, db) {
-          if(err) { return console.dir(err); }
-          else { alert("connected"); }
-
-          var collection = db.collection('test');
-          var doc1 = {'hello':'doc1'};
-          var doc2 = {'hello':'doc2'};
-          var lotsOfDocs = [{'hello':'doc3'}, {'hello':'doc4'}];
-
-          collection.insert(doc1);
-
-          collection.insert(doc2, {w:1}, function(err, result) {});
-
-          collection.insert(lotsOfDocs, {w:1}, function(err, result) {});
-
-        });
-    }
-    */
     </script>
 
   </head>
