@@ -172,13 +172,15 @@ router.post('/searchFind', function(req, res, next){
 /* GET search page. */
 router.get('/search', function(req, res, next) {
   /* Filter multiple user results */
-  var foundNames = [];
-  var foundUsernames = [];
+  if (searchResults != null){
+    var foundNames = [];
+    var foundUsernames = [];
 
-  for (i in searchResults) {
-    console.dir(searchResults[i].name);
-    foundNames.push(searchResults[i].name);
-    foundUsernames.push(searchResults[i].username);
+    for (i in searchResults) {
+      console.dir(searchResults[i].name);
+      foundNames.push(searchResults[i].name);
+      foundUsernames.push(searchResults[i].username);
+    }
   }
     res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
 });
