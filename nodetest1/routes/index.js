@@ -142,12 +142,21 @@ router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
   console.dir(searchedTerm);
 
-  //Find user based on username
+  //Find user based on username - should result in one user
   User.findOne({username: searchedTerm}, function(err, user) {
-    //Password matches and go through
     if (user == null){ //user not found
-      console.dir('user not found')
-      res.redirect('/searchFind2');
+
+      console.dir("User not found - searching names");
+        User.find ({name: searchedTerm}, function(err, users) {
+          if (users.length == 0) {
+            console.dir("Users not found");
+            res.redirect('/data');
+          } else {
+            console.dir("Users found");
+            res.redirect("/search");
+          }
+        });
+
     } else {
         console.dir("User found");
         res.redirect('/profile');
