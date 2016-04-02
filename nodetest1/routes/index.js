@@ -211,16 +211,109 @@ io.on('connection', function(client){
 
     });
 
-  client.on('subscribe', function(room){
-        console.log('Logging into room ', room);
-        client.join(room);
-        //TODO:load all messages from db
+  
+  client.on('subscribe', function(data){
+
+    User.findOne({username: data.user}, function(err, user) {
+
+      if (!user) {//Username not taken
+
+        console.log("no user with that name");
+
+      }else{
+
+        var room = 0;
+
+        var chats = user.chats;
+
+        var index = -1;
+
+        for (var i = 0; i < chats.length; i++){
+          if(chats[i].user == data.receiver){
+            index = i;
+          }
+        }
+
+        console.log("index",index)
+
+        if(index < 0){
+
+          Chat.count(function(err, c){
+
+            room = c;
+
+          });
+          var messages = [];
+
+          //creates a new room for the conversation
+          var chatRoom = new Chat({roomName: room, messages:messages});
+          chatRoom.save(function(err, funct) {
+            console.dir("New room Saved.");
+          });
+
+          var userChats = chats.slice(0);
+          var chatUser = {room:room, user: data.receiver};
+
+          userChats.push(chatUser);
+
+          user.chats = userChats;
+
+          user.save();
+
+          User.findOne({username: data.receiver}, function(err, receiver){
+
+            var reChats = receiver.chats.slice(0);
+
+            var chatReceiver = {room:room, user: data.user};
+
+            reChats.push(chatReceiver);
+
+            receiver.chats = reChats;
+
+            receiver.save();
+
+          });
+
+          console.log(data.user, ' logging into room ', room);
+          client.join(room);
+
+        }else{
+          room = chats[index].room;
+
+          console.log(data.user, ' logging into room ', room);
+          client.join(room);
+
+        }
+
+        Chat.findOne({roomName: room}, function(err, chatRoom){
+
+          if(chatRoom){
+
+            var log = {room: room, log:chatRoom.messages};
+
+            client.emit('message log', log);
+          }
+
+        });
+
+      }
+    });
+
   });
 
   client.on('message', function(data){
         console.log(data);
-        io.sockets.in(data.room).emit('message', data.msg);
-        //TODO: Save msg to db
+        io.sockets.in(data.room).emit('message', data);
+
+        Chat.findOne({roomName: data.room}, function(err, chat){
+
+          var addMsg = chat.messages.slice(0);
+          var newMessage = {msg:data.msg, sender:data.sender}
+          addMsg.push(newMessage);
+          chat.messages = addMsg;
+          chat.save();
+
+        })
   });
 
 

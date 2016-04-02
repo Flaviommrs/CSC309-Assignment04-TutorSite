@@ -16,7 +16,8 @@ var userSchema = new mongoose.Schema({
   subjects: [String],
   freeTimes: String,
   events: String,
-  fbID: { type: String, unique: true }
+  fbID: { type: String, unique: false },
+  chats: [{room: Number, user: String}]//CHECK THIS
 });
 
 var User = mongoose.model('User', userSchema);
