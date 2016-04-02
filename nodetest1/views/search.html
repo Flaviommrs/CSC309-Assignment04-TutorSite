@@ -4,7 +4,7 @@
 	  <head>
 	    <link rel="stylesheet" type="text/css" href="/stylesheets/searchstyle.css">
 	    <title>Tutor Me</title> 
-	    <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
+	    <link rel="icon" href="images/favicon.png"> 
 	  </head>
 
 	<!-- Header bar -->
@@ -31,18 +31,16 @@
 		</div>
 		-->
 
-		<div>
-
-			<p>
-				Results From your Search: <%=search %>
-				<br>
-				<br>
-				<%=name %>
-				<br>
-				<%=username %>
-			</p>
-
-		</div>
+<!-- Replace tree pictures with user profile pics later -->
+<ul class="rig columns-4">
+	<% for(var i=0; i < results.length; i++){ %>
+			<li>
+				<img src="images/pri_001.jpg" />
+				<h3><%= results[i].username %></h3>
+				<p>Name: <%=results[i].name %></p>
+			</li>
+	<% } %>
+</ul>
 
 		<!--
 

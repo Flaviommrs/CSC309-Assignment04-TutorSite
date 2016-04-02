@@ -4,7 +4,7 @@
   <head>
     <link rel="stylesheet" type="text/css" href="/stylesheets/reviewstyle.css">
     <title>Tutor Me</title> 
-    <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
+    <link rel="icon" href="images/favicon.png"> 
   </head>
 
   <body>
@@ -12,8 +12,8 @@
     <div class="header">
       <a href="/"><img  id="logo" src="images/logo.png" alt="Logo"></a>    </div>
     <div class="search_container">
-      <form action="/search" class="search-wrapper cf">
-          <input type="text" placeholder="Search..." required="">
+      <form action="/searchFind" method='post' class="search-wrapper cf">
+          <input type="text" name='search' placeholder="Search..." required="">
           <button type="submit">Search</button>
       </form>
     </div>
@@ -24,8 +24,9 @@
 
     </div>
 
+  <form action="/addReview" method='post'>
     <div>
-      <p>Name: <input type="text" placeholder="Tutor Name"></p>
+      <p>Name: <input type="text" name="tutName" placeholder="Tutor Name"></p>
       
     </div>
 
@@ -39,8 +40,10 @@
 
     <div class="comentaries">
       <p>Comentaries:</p>
-      <textarea></textarea>
+      <input type="text" id="comment" name="comment" placeholder="Comment here...">
     </div>
+    <button id="rev_btn" type="submit">Search</button>
+  </form>
 
   </body>
 

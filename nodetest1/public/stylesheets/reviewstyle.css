@@ -26,18 +26,23 @@ h1{
 
 }
 
+#rev_btn{
+    width: 600px;
+    margin-left: 400px;
+}
+
 #rating{
         width: 47%;
         float: left;
 }
 
 #rating p{
-
+    margin-left: 500px;
     float: right;
 
 }
 
-textarea {
+#comment {
     height:100px;
     width: 70%;
     margin-left: 15%;

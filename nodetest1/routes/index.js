@@ -164,7 +164,6 @@ router.get('/inbox', function(req, res, next) {
     res.render('inbox.html', {});
 });
 
-
 /* GET links page. */
 router.get('/links', function(req, res, next) {
     res.render('links.html', {});
@@ -187,6 +186,22 @@ router.get('/message', function(req, res, next) {
 /* GET profile page. */
 router.get('/profile', function(req, res, next) {
     res.render('profile.html', {});
+});
+
+/* POST store review data. */
+router.post('/addReview', function(req, res, next){
+  console.dir(req.body.tutName);
+  console.dir(req.body.comment);
+
+  var comment = new Review({name: req.body.realname, username: req.body.uname, password: req.body.pword});
+
+  input_user.save(function(err, funct) {
+    if(!err){
+      console.dir("New User Saved.");
+    } else {
+        console.dir("Failed to save user: ");
+        console.dir(err);
+    }
 });
 
 /* GET review page. */
@@ -231,18 +246,7 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  /* Filter multiple user results */
-  if (searchResults != null){
-    var foundNames = [];
-    var foundUsernames = [];
-
-    for (i in searchResults) {
-      console.dir(searchResults[i].name);
-      foundNames.push(searchResults[i].name);
-      foundUsernames.push(searchResults[i].username);
-    }
-  }
-    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
+  res.render('search.html', {search: searchedTerm, results: searchResults});
 });
 
 /* GET weekview page. */

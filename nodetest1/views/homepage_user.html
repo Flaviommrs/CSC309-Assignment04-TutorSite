@@ -4,7 +4,7 @@
   <head>
     <link rel="stylesheet" type="text/css" href="/stylesheets/homepage_user.css">
     <title>Tutor Me: Home</title> 
-    <link rel="icon" href="/images/favicon.png"> <!-- favicon not yet made -->
+    <link rel="icon" href="/images/favicon.png"> 
   </head>
 
 <!-- Header bar -->
@@ -13,8 +13,8 @@
 </div>
 
 <div class="search_container">
-  <form action="/search" class="search-wrapper cf">
-        <input type="text" placeholder="Search..." required="">
+  <form action="/searchFind" method='post' class="search-wrapper cf">
+        <input name='search' type="text" placeholder="Search..." required="">
         <button type="submit">Search</button>
     </form>
 </div>
