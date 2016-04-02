@@ -35,7 +35,13 @@ router.post('/usernameTest', function(req, res, next){
       var input_user = new User({username: req.body.uname, password: req.body.pword});
 
       input_user.save(function(err, funct) {
-        console.dir("New User Saved.");
+        if(!err){
+            console.dir("New User Saved.");
+        } else {
+            console.dir("Failed to save user: ");
+            console.dir(err);
+        }
+
       });
     }
       res.redirect('/data');
@@ -186,7 +192,12 @@ io.on('connection', function(client){
             console.log("This is the input_user:");
             console.log(input_user);
             input_user.save(function(err, funct) {
-              console.dir("New User Saved.");
+                if(!err){
+                    console.dir("New User Saved.");
+                } else {
+                    console.dir("Failed to save user: ");
+                    console.dir(err);
+                }
             });
           }
         });
