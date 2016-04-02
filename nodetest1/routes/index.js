@@ -265,14 +265,14 @@ router.get('/profile&username=*', function(req, res, next) {
 // Getting json object by username
 router.get('/username=*', function(req, res, next) {
 
-    User.find({name: req.url.substring(10)}, function(err, user) {
+    User.find({username: req.url.substring(10)}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
         res.writeHead(200, {"Content-Type": "text/html"});
         res.write(JSON.stringify(user[0]));
         res.end();
     });
-    
+
 });
 
 function checkNewUserData(data)
