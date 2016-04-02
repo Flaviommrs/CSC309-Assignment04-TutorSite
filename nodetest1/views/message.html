@@ -62,18 +62,29 @@
 </div>
 <script src="javascript/socket.io/socket.io.js"></script>
 <script>
-  
+
     var room = -1;
     var socket = io.connect('http://localhost:4200');
 
-    chatData = {user:"Dummy", receiver:"Dummy2"}
+    chatData = {user:"testingSubjects", receiver:"balbla"}
 
     socket.emit('subscribe', chatData);
 
     socket.on('message', function(data){
+        var myUser = <%- JSON.stringify(userNameReceived) %>;
+        alert(myUser);
+        if(myUser == data.sender)
+        {
+                $('#messageBoard').html($('#messageBoard').html() + "<div class='msg2'><p>" + data.msg + "</p></div>");
+        }
+        else
+        {
+                $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + data.msg + "</p></div>");
+        }
 
-      $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + data.msg + "</p></div>");
     });
+
+
 
     socket.on('message log', function(data){
 
@@ -81,22 +92,29 @@
       var log = data.log;
 
       for(var i = 0; i < log.length; i++){
-
-        $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + log[i].msg + "</p></div>");
-
+          var myUser = <%- JSON.stringify(userNameReceived) %>;
+          alert(myUser);
+          if(myUser == log[i].sender)
+          {
+                  $('#messageBoard').html($('#messageBoard').html() + "<div class='msg2'><p>" + log[i].msg + "</p></div>");
+          }
+          else
+          {
+                  $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + log[i].msg + "</p></div>");
+          }
       }
 
 
     });
 
     function sendMSG(){
-        var data = {msg:$('#m').val(), room:room, sender:"Dummy"};
+        var data = {msg:$('#m').val(), room:room, sender:"testingSubjects"};
         socket.emit('message', data);
         $('#m').val('');
         return false;
     }
- 
-   
+
+
 
 </script>
 

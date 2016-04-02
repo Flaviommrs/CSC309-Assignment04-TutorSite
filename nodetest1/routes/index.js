@@ -135,7 +135,7 @@ router.get('/facebookLog', function(req, res, next) {
 
 /* GET user homepage page. */
 router.get('/homepage', function(req, res, next) {
-    var secret = 'tutorMeSecretString2';
+    var secret = 'tutorMeSecretString';
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     console.dir(result);
     if(result)
@@ -172,7 +172,16 @@ router.get('/links', function(req, res, next) {
 
 /* GET message page. */
 router.get('/message', function(req, res, next) {
-    res.render('message.html', {});
+    var secret = 'tutorMeSecretString';
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        res.render('message.html', {userNameReceived: result});
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
 });
 
 /* GET profile page. */
@@ -313,7 +322,7 @@ io.on('connection', function(client){
         });
     });
 
-  
+
   client.on('subscribe', function(data){
 
     User.findOne({username: data.user}, function(err, user) {
