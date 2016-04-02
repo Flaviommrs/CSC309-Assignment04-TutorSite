@@ -15,6 +15,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 //Get db model
 var User = require('../models/user');
 var Chat = require('../models/chat');
+var Review = require('../models/reviews');
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -189,6 +190,24 @@ router.get('/profile', function(req, res, next) {
     res.render('profile.html', {});
 });
 
+/* POST store review data. */
+router.post('/addReview', function(req, res, next){
+  console.dir(req.body.tutName);
+  console.dir(req.body.comment);
+
+  var comment = new Review({reviewee: 'tester', name: req.body.realname, username: req.body.uname, password: req.body.pword});
+
+  comment.save(function(err, funct) {
+    if(!err){
+      console.dir("New comment.");
+      res.redirect("/profile&username=" + req.body.tutName);
+    } else {
+        console.dir("Failed to save comment ");
+        console.dir(err);
+    }
+  });
+});
+
 /* GET review page. */
 router.get('/review', function(req, res, next) {
     res.render('review.html', {});
@@ -224,7 +243,7 @@ router.post('/searchFind', function(req, res, next){
     } else {
         console.dir("User found");
         searchResults = user;
-        res.redirect('/profile');
+        res.redirect("/profile&username=" + searchedTerm);
     }
   });
 })

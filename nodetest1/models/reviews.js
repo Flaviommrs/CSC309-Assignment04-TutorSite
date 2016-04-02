@@ -1,12 +1,12 @@
 var mongoose = require('mongoose');
 
 var reviewSchema = new mongoose.Schema({
-  reviewee = {type: String, required: true},
-  reviews = [{
-    reviewer = String,
-    likes = Number,
-    Rating = Number,
-    commented = String
+  reviewee : {type: String, required: true},
+  reviews : [{
+    reviewer : String,
+    likes : Number,
+    Rating : Number,
+    commented : String
   }]
 });
 
