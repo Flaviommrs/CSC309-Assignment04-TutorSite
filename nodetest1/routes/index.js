@@ -91,7 +91,7 @@ router.post('/LoginAuthentication', function(req, res, next){
     //Password matches and go through
     if (user == null){ //user not found
       console.dir('user not found')
-      res.redirect('/data');
+      res.redirect('/');
     } else {
       //Password matches and go through
       if (user.password == log_password) {
@@ -106,7 +106,7 @@ router.post('/LoginAuthentication', function(req, res, next){
 
         res.redirect('/homepage');
       } else {
-        res.redirect('/data');
+        res.redirect('/');
       }
     }
 
