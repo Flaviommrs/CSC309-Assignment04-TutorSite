@@ -31,4 +31,7 @@ function loadUser(username) {
     });
 };
 
-loadUser(window.location.pathname.substring(18));
+if(window.location.pathname.length > 18)
+{
+        loadUser(window.location.pathname.substring(18));
+}

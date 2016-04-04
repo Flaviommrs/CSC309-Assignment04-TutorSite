@@ -185,11 +185,6 @@ router.get('/message', function(req, res, next) {
     }
 });
 
-/* GET profile page. */
-router.get('/profile', function(req, res, next) {
-    res.render('profile.html', {});
-});
-
 /* POST store review data. */
 router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
@@ -283,12 +278,25 @@ router.get('/profile&username=*', function(req, res, next) {
 
 // Getting json object by username
 router.get('/username=*', function(req, res, next) {
-
+    if(req.url.length <= 10)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
     User.find({username: req.url.substring(10)}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
-        res.writeHead(200, {"Content-Type": "text/html"});
-        res.write(JSON.stringify(user[0]));
+        if(user[0])
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write(JSON.stringify(user[0]));
+        }
+        else
+        {
+            res.writeHead(404, {"Content-Type": "text/html"});
+            res.write("not found");
+        }
         res.end();
     });
 
