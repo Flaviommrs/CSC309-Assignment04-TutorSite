@@ -46,15 +46,32 @@
             events: eventsReceived,
 
             eventClick: function(calEvent, jsEvent, view) {
+                //Change the border color of the event to red
+                $(this).css('border-color', 'red');
 
                 if(calEvent.title != "Available Slot")
                 {
-                    alert("Sorry. This slot is not available.");
+                    if(calEvent.title == <%- JSON.stringify(uname_logged) %>)
+                    {
+                        if(confirm("Do you want to cancel your reservation for this slot?")){
+                            //Mark event as available
+                            calEvent.title = 'Available Slot';
+                            calEvent.color = '#3a87ad';
+                            $('#calendar').fullCalendar('updateEvent', calEvent);
+                            //TODO: Save changes to database here
+                        }
+
+                    }
+                    else
+                    {
+                        alert("Sorry. This slot is not available.");
+                    }
+
+                    $(this).css('border-color', '#3a87ad');
                     return;
                 }
 
-                //Change the border color of the event to red
-                $(this).css('border-color', 'red');
+
 
                 if(confirm("Do you want to reserve this timeslot?")){
                     //Mark event as reserved
