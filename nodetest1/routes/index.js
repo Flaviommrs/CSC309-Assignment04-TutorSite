@@ -299,6 +299,8 @@ Search cases:
 user looks for username
 user looks for name
 user looks subject
+
+recommmendation system based on rating 
 */
 
 /* POST search page - find user. */
