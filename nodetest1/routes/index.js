@@ -159,6 +159,117 @@ router.get('/fbsignup', function (req, res, next){
 router.get('/', function(req, res, next) {
   res.render('homepage_inital.html', {});
 });
+/* GET admin page. */
+router.get('/admin', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  res.render('admin.html', {result: true, info: null});
+              }
+              else
+              {
+                  res.render('admin.html', {result: false});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false});
+    }
+});
+/* GET admin page. */
+router.get('/admin/users', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  User.find({}, function(err, db_data) {
+                      if (err) return console.error(err);
+                      res.render('admin.html', {result: true, info: db_data});
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false});
+    }
+});
+/* GET admin page. */
+router.get('/admin/chat', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  Chat.find({}, function(err, db_data) {
+                      if (err) return console.error(err);
+                      res.render('admin.html', {result: true, info: db_data});
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false});
+    }
+});
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
@@ -354,7 +465,7 @@ user looks for username
 user looks for name
 user looks subject
 
-recommmendation system based on rating 
+recommmendation system based on rating
 */
 
 /* POST search page - find user. */
