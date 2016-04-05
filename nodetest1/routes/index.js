@@ -293,8 +293,21 @@ router.get('/weekView&username=*', function(req, res, next) {
     }
     else
     {
-        var username = req.url.substring(19);
-        res.render('weekview.html', {userNameReceived: username});
+        var uname = req.url.substring(19);
+        User.find({username: uname}, function(err, user) {
+            if (err) return console.error(err);
+            if(user[0])
+            {
+                var user_events = user[0].freeTimes;
+                res.render('weekview.html', {events: JSON.stringify(user_events)});
+            }
+            else
+            {
+                res.writeHead(404, {"Content-Type": "text/html"});
+                res.write("not found");
+                res.end();
+            }
+        });
     }
 
 });

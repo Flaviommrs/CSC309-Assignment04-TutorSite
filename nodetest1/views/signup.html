@@ -122,7 +122,8 @@
     $(function() {
         $('form').submit(function() {
 
-            checkAllForms();
+            //TODO: implement this function
+            //checkAllForms();
 
             /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
@@ -132,6 +133,7 @@
             for (var i = 0; i < myEvents.length; i++)
             {
                 var newEvent = {};
+                newEvent.title = "Available Slot";
                 newEvent.start = myEvents[i].start;
                 if(myEvents[i].end == null){
                     newEvent.end = moment(myEvents[i].start).add(2, 'hours');
