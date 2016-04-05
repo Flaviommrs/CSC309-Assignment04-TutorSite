@@ -294,6 +294,13 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
+/*
+Search cases:
+user looks for username
+user looks for name
+user looks subject
+*/
+
 /* POST search page - find user. */
 var searchedTerm = null;
 var searchResults = null;
@@ -314,10 +321,12 @@ router.post('/searchFind', function(req, res, next){
             console.dir("Users not found");
             res.redirect('/data');
           } else {
-            console.dir("Users found");
-            console.dir(users);
-            searchResults = users;
-            res.redirect("/search");
+            User.find ({name: searchedTerm}, function(err, users) {
+              console.dir("Users found");
+              console.dir(users);
+              searchResults = users;
+              res.redirect("/search");
+            }
           }
         });
 

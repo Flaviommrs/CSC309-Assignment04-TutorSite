@@ -4,6 +4,7 @@ var reviewSchema = new mongoose.Schema({
   reviewee : {type: String, required: true},
   reviewer : {type: String, required: true},
   rating : Number,
+  useful_counter: Number,
   commented : String
 });
 
