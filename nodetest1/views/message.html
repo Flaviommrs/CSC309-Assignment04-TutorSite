@@ -66,6 +66,7 @@
 
     socket.on('message', function(data){
         var myUser = <%- JSON.stringify(logged) %>;
+        console.log(data);
         if(myUser == data.sender)
         {
                 $('#messageBoard').html($('#messageBoard').html() + "<div class='msg2'><p>" + data.msg + "</p></div>");

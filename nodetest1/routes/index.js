@@ -114,6 +114,60 @@ router.post('/LoginAuthentication', function(req, res, next){
 
 });
 
+router.post('/facebookLog', function(req, res, next){
+
+  var log_username = req.body.username;
+
+  var secret = 'tutorMeSecretString';
+  var val = cookieSign.sign(log_username, secret);
+  res.clearCookie('tutorMeData');
+  res.cookie('tutorMeData' , val, {expire : new Date() + 9999});
+
+  res.redirect('/homepage');
+
+});
+
+router.post('/facebookSignUp',function (req, res, next){
+
+
+  var username = req.body.username;
+  var password = req.body.password;
+  var name = req.body.name;
+  var email = req.body.email;
+
+  console.log(username,password, name, email);
+
+  User.findOne({username: username}, function (err, user) {
+
+    if (!user)
+    {//Username not taken
+      var input_user = new User({name:username, email:email, username: username, password: password});
+      console.log("This is the input_user:");
+      console.log(input_user);
+      input_user.save(function(err, funct) {
+          if(!err){
+              console.dir("New User Saved.");
+          } else {
+              console.dir("Failed to save user: ");
+              console.dir(err);
+          }
+      });
+    }
+    else
+    {
+
+    }
+  });
+
+  res.redirect('/fbsignup');
+});
+
+router.get('/fbsignup', function (req, res, next){
+
+  res.render('signup.html', {});
+
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('homepage_inital.html', {});
@@ -129,7 +183,7 @@ router.get('/editProfile', function(req, res, next) {
     res.render('editprofile.html', {});
 });
 
-/* GET fb login page. */
+/* GET fb login page. Test*/
 router.get('/facebookLog', function(req, res, next) {
     res.render('facebookLog.html', {});
 });
@@ -496,7 +550,7 @@ io.on('connection', function(client){
 
       if (!user) {//Username not taken
 
-        console.log("no user with that name");
+        console.log("no user with that name", err);
 
       }else{
 
