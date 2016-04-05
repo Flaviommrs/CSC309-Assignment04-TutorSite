@@ -411,7 +411,7 @@ user looks for username
 user looks for name
 user looks subject
 
-recommmendation system based on rating 
+recommmendation system based on rating
 */
 
 /* POST search page - find user. */
@@ -439,7 +439,7 @@ router.post('/searchFind', function(req, res, next){
               console.dir(users);
               searchResults = users;
               res.redirect("/search");
-            }
+            });
           }
         });
 
