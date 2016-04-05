@@ -214,7 +214,7 @@ router.get('/message&username=*', function(req, res, next) {
                 if (err) return console.error(err);
                 if(user[0])
                 {
-                    res.render('message.html', {userNameReceived: uname_logged, uname: uname});
+                    res.render('message.html', {logged: uname_logged, receiver: uname});
                 }
                 else
                 {
