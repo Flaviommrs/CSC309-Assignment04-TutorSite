@@ -331,18 +331,8 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  /* Filter multiple user results */
-  if (searchResults != null){
-    var foundNames = [];
-    var foundUsernames = [];
 
-    for (i in searchResults) {
-      console.dir(searchResults[i].name);
-      foundNames.push(searchResults[i].name);
-      foundUsernames.push(searchResults[i].username);
-    }
-  }
-    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
+    res.render('search.html', {search: searchedTerm, results: searchResults});
 });
 
 /* GET weekview page. */
