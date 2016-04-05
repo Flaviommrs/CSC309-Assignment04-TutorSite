@@ -137,8 +137,11 @@ router.get('/facebookLog', function(req, res, next) {
 /* GET user homepage page. */
 router.get('/homepage', function(req, res, next) {
     var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('homepage_inital.html', {});
+    }
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    console.dir(result);
     if(result)
     {
         res.render('homepage_user.html', {});
@@ -174,6 +177,10 @@ router.get('/links', function(req, res, next) {
 /* GET message page. */
 router.get('/message', function(req, res, next) {
     var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('homepage_inital.html', {});
+    }
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
@@ -261,7 +268,35 @@ router.get('/search', function(req, res, next) {
 
 /* GET weekview page. */
 router.get('/weekView', function(req, res, next) {
-    res.render('weekview.html', {});
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    console.dir(result);
+    if(result)
+    {
+        res.redirect('/weekView&username=' + result);
+    }
+    else
+    {
+        res.redirect('/');
+    }
+});
+router.get('/weekView&username=*', function(req, res, next) {
+    if(req.url.length <= 19)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
+    else
+    {
+        var username = req.url.substring(19);
+        res.render('weekview.html', {userNameReceived: username});
+    }
+
 });
 
 /* GET weekview page. */
