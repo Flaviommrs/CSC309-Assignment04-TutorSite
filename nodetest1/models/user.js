@@ -9,8 +9,8 @@ var userSchema = new mongoose.Schema({
   admin: { type: Boolean, default: false },
   picture: String,//BinData, did not work for some reason - THIS WILL BE CHANGED! PICTURE IS NOT A STRING!
   location: {
-      country: { type: String, default: "" },
-      city: { type: String, default: "" },
+      country: { type: String, default: "Canada" },
+      city: { type: String, default: "Toronto" },
       zipcode: { type: String, default: "" },
   },
   subjects: [String],
@@ -24,7 +24,7 @@ var userSchema = new mongoose.Schema({
   phone: { type: String, default: "" },
   rate: { type: Number, default: 40 },
   sum_rating: { type: Number, default: 0 },
-  rating_count: { type: Number, default: 1 }
+  rating_count: { type: Number, default: 0 }
 });
 
 var User = mongoose.model('User', userSchema);

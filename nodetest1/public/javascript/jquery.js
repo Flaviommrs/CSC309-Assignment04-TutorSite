@@ -4,9 +4,10 @@ function seeSched()
 {
     if(uname != "")
     {
-            window.location.href = '/weekView&username=' + uname;
+        window.location.href = '/weekView&username=' + uname;
     }
 }
+
 function seeMsg()
 {
     //TODO!
@@ -47,7 +48,33 @@ function loadUser(username) {
     });
 };
 
+function loadReviews(username) {
+    document.getElementById("reviews").innerHTML += `<p>REVIEWS</p>`
+    for (review in [1,2]){
+        var string = `<div class="review">
+                <div class="inline review-content">
+                    <div class="leftreview">
+                        <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
+                    </div>
+                    <div class="rightreview">
+                        <p>Rating: ...</p>
+                        <p>(THE REVIEW)</p>
+                    </div>
+                </div>
+                <div>
+                    <p>SpongeBob SquarePants</p>
+                </div>
+                <div class="right">
+                    <button class="ratereview">Useful</button>
+                    <button class="ratereview">Not Useful</button>
+                </div>
+            </div>`
+        document.getElementById("reviews").innerHTML += string
+    }
+}
+
 if(window.location.pathname.length > 18)
 {
-        loadUser(window.location.pathname.substring(18));
+    loadUser(window.location.pathname.substring(18));
+    loadReviews(window.location.pathname.substring(18));
 }
