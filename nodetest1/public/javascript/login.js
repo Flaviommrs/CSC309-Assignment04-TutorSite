@@ -29,7 +29,6 @@ function facebookSignUp(){
 						signUpForm(data);
 					});
 
-
 				}
 
 			},{

@@ -54,26 +54,34 @@ h1{
 
 }
 
-/* Code from https://css-tricks.com/star-ratings/*/
 .rating {
-  unicode-bidi: bidi-override;
-  direction: rtl;
-  width: 7%;
-  float: right;
-  margin-right: 45%;
+    overflow: hidden;
+    display: inline-block;
+    font-size: 0;
+    position: relative;
 }
-.rating > span {
-  display: inline-block;
-  position: relative;
-  width: 1.1em;
+.rating-input {
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0 0 0 -16px;
+    opacity: 0;
 }
-.rating > span:hover:before,
-.rating > span:hover ~ span:before {
-   content: "\2605";
-   position: absolute;
+.rating:hover .rating-star:hover,
+.rating:hover .rating-star:hover ~ .rating-star,
+.rating-input:checked ~ .rating-star {
+    background-position: 0 0;
 }
-
-/*The code stops here*/
+.rating-star,
+.rating:hover .rating-star {
+    position: relative;
+    float: right;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url('http://kubyshkin.ru/samples/star-rating/star.png') 0 -16px;
+}
 
 /* Header Styles */
 .header {
@@ -84,8 +92,7 @@ h1{
 }
 
 #logo{
-	padding-left: 20px;
-	padding-top: 7px;
+    padding-left: 15px;
 }
 
 /* Search bar */

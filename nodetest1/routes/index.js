@@ -27,24 +27,11 @@ router.get('/data', function(req, res, next) {
     });
 });
 
-//COOKIE TESTER PAGE
-router.get('/cookiesignread', function(req, res, next) {
-    console.dir(cookieSign.unsign(req.cookies.testingSign, 'tobiiscool'));
-    res.redirect('/');
-});
-//COOKIE TESTER PAGE
-router.get('/cookiesign', function(req, res, next) {
-    var val = cookieSign.sign('hello', 'tobiiscool');
-    res.clearCookie('testingSign');
-    res.cookie('testingSign' , val, {expire : new Date() + 9999}).send('Cookie is set');
-});
-
-
-//COOKIE TESTER PAGE
-router.get('/cookie', function(req, res, next) {
+//LOGOUT PAGE
+router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
     res.clearCookie('MyCookie');
-    res.cookie('MyCookie' , 'cookie_value123', {expire : new Date() + 9999}).send('Cookie is set');
+    res.redirect('/');
 });
 
 /* Test from html file input to server to database */
@@ -208,7 +195,7 @@ router.get('/homepage', function(req, res, next) {
 
 /* GET inbox page. */
 router.get('/inbox', function(req, res, next) {
-    res.render('inbox.html', {});
+    res.redirect('/message');
 });
 
 
@@ -227,7 +214,42 @@ router.get('/message', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('inbox.html', {userNameReceived: result});
+        User.find({username: result}, function(err, user) {
+            if (err) return console.error(err);
+            if(user[0])
+            {
+                var user = user[0];
+                var chats = user.chats;
+                var allTalks = {};
+                var listOfTalks = [];
+                for(var i = 0; i < chats.length; i++)
+                {
+                    var found = 0;
+                    var userTalkingTo = chats[i].user;
+                    Chat.find({roomName: chats[i].room}, function(err, chatFound) {
+                        found++;
+                        if(chatFound[0])
+                        {
+                            var lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
+                            var talk = {name: userTalkingTo, message: lastMsg, read: read};
+                            listOfTalks.push(talk);
+                        }
+                        if(found == chats.length)
+                        {
+                            allTalks.results = listOfTalks;
+                            res.render('inbox.html', {userNameReceived: result, allTalks: JSON.stringify(allTalks)});
+                        }
+                    });
+                }
+            }
+            else
+            {
+                res.writeHead(404, {"Content-Type": "text/html"});
+                res.write("not found");
+                res.end();
+            }
+        });
     }
     else
     {
@@ -282,7 +304,33 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var comment = new Review({reviewee: 'tester', name: req.body.realname, username: req.body.uname, password: req.body.pword});
+  var rating_var = null;
+
+  if (req.body.star1 != undefined){
+    console.dir(req.body.star1);
+    rating_var = 1;
+  };
+
+    if (req.body.star2 != undefined){
+    console.dir(req.body.star2);
+    rating_var = 2;
+  };
+    if (req.body.star3 != undefined){
+    console.dir(req.body.star3);
+    rating_var = 3;
+  };
+    if (req.body.star4 != undefined){
+    console.dir(req.body.star4);
+    rating_var = 4;
+  };
+    if (req.body.star5 != undefined){
+    console.dir(req.body.star5);
+    rating_var = 5;
+  };
+
+
+  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
@@ -299,6 +347,15 @@ router.post('/addReview', function(req, res, next){
 router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
+
+/*
+Search cases:
+user looks for username
+user looks for name
+user looks subject
+
+recommmendation system based on rating 
+*/
 
 /* POST search page - find user. */
 var searchedTerm = null;
@@ -320,10 +377,12 @@ router.post('/searchFind', function(req, res, next){
             console.dir("Users not found");
             res.redirect('/data');
           } else {
-            console.dir("Users found");
-            console.dir(users);
-            searchResults = users;
-            res.redirect("/search");
+            User.find ({name: searchedTerm}, function(err, users) {
+              console.dir("Users found");
+              console.dir(users);
+              searchResults = users;
+              res.redirect("/search");
+            });
           }
         });
 
@@ -337,18 +396,8 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  /* Filter multiple user results */
-  if (searchResults != null){
-    var foundNames = [];
-    var foundUsernames = [];
 
-    for (i in searchResults) {
-      console.dir(searchResults[i].name);
-      foundNames.push(searchResults[i].name);
-      foundUsernames.push(searchResults[i].username);
-    }
-  }
-    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
+    res.render('search.html', {search: searchedTerm, results: searchResults});
 });
 
 /* GET weekview page. */
