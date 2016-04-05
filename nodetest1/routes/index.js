@@ -184,12 +184,52 @@ router.get('/message', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('message.html', {userNameReceived: result});
+        res.render('inbox.html', {userNameReceived: result});
     }
     else
     {
         res.render('homepage_inital.html', {});
     }
+});
+router.get('/message&username=*', function(req, res, next) {
+
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('homepage_inital.html', {});
+    }
+    var uname_logged = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(uname_logged)
+    {
+        if(req.url.length <= 18)
+        {
+            res.writeHead(404, {"Content-Type": "text/html"});
+            res.write("not found");
+            res.end();
+        }
+        else
+        {
+            var uname = req.url.substring(18);
+            User.find({username: uname}, function(err, user) {
+                if (err) return console.error(err);
+                if(user[0])
+                {
+                    res.render('message.html', {userNameReceived: uname_logged, uname: uname});
+                }
+                else
+                {
+                    res.writeHead(404, {"Content-Type": "text/html"});
+                    res.write("not found");
+                    res.end();
+                }
+            });
+        }
+    }
+    else
+    {
+        res.redirect('/');
+    }
+
 });
 
 /* POST store review data. */
