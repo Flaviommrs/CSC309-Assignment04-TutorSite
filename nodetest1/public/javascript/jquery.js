@@ -1,3 +1,17 @@
+var uname = "";
+
+function seeSched()
+{
+    if(uname != "")
+    {
+            window.location.href = '/weekView&username=' + uname;
+    }
+}
+function seeMsg()
+{
+    //TODO!
+}
+
 function loadUser(username) {
     var request = $.ajax({
         method: "GET",
@@ -6,6 +20,7 @@ function loadUser(username) {
 
     request.done(function(msg) {
         var json = JSON.parse(msg);
+        uname = json["username"];
         document.getElementById("name").innerHTML = "Name: " + json["name"];
         document.getElementById("occupation").innerHTML = "Occupation: " + json["occupation"];
         document.getElementById("education").innerHTML = "Education: " + json["education"];
@@ -28,6 +43,7 @@ function loadUser(username) {
     });
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );
+        uname = "";
     });
 };
 
