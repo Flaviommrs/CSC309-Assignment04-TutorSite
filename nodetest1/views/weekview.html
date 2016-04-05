@@ -12,10 +12,46 @@
     <script src='javascript/fullcalendar/fullcalendar.min.js'></script>
     <script src='javascript/lib/jquery-ui.custom.min.js'></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/styleWeekView.css">
-    <title>Tutor Me - Registration Page</title>
+    <title>Tutor Me - Schedule page</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
+    <script src="javascript/socket.io/socket.io.js"></script>
+
     <script>
+
+    function saveEventChangesToDB()
+    {
+        var myJSONObj = {};
+        myJSONObj.uname_logged = <%- JSON.stringify(uname_logged) %>;
+        myJSONObj.uname = <%- JSON.stringify(uname) %>
+
+        var myEvents = $('#calendar').fullCalendar('clientEvents');
+
+        var nonCircularEvents = [];
+        for (var i = 0; i < myEvents.length; i++)
+        {
+            var newEvent = {};
+            // OCCUPIED EVENT = #EF6C00
+            // FREE SLOT = #3a87ad;
+            newEvent.color = myEvents[i].color;
+            newEvent.title = myEvents[i].title;
+            newEvent.start = myEvents[i].start;
+            newEvent.end = myEvents[i].end;
+            nonCircularEvents.push(newEvent);
+        }
+
+        myJSONObj.events = nonCircularEvents;
+
+        //SAVE TO DB
+        var socket = io.connect('http://localhost:4200');
+        socket.on('connect', function(data) {
+            socket.emit('updateEvs', JSON.stringify(myJSONObj));
+            socket.on('failedDB', function(data) {
+                alert("Some unexpected problem happened on saving your data. Please try again.");
+                location.reload();
+            });
+        });
+    }
 
     $(document).ready(function() {
 
@@ -59,6 +95,7 @@
                             calEvent.color = '#3a87ad';
                             $('#calendar').fullCalendar('updateEvent', calEvent);
                             //TODO: Save changes to database here
+                            saveEventChangesToDB();
                         }
 
                     }
@@ -79,6 +116,7 @@
                     calEvent.color = '#EF6C00';
                     $('#calendar').fullCalendar('updateEvent', calEvent);
                     //TODO: Save changes to database here
+                    saveEventChangesToDB();
                 }
                 //return border to previous color
 

@@ -150,17 +150,6 @@ router.get('/homepage', function(req, res, next) {
     {
         res.render('homepage_inital.html', {});
     }
-
-    /* NO SECURITY VERSION
-    if(req.cookies.tutorMeData)
-    {
-        res.render('homepage_user.html', {});
-    }
-    else
-    {
-        res.render('homepage_inital.html', {});
-    }
-    */
 });
 
 /* GET inbox page. */
@@ -347,7 +336,7 @@ router.get('/weekView&username=*', function(req, res, next) {
                 if (err) return console.error(err);
                 if(user[0])
                 {
-                    var user_events = user[0].freeTimes;
+                    var user_events = user[0].events;
                     res.render('weekview.html', {events: JSON.stringify(user_events), uname: uname, uname_logged: uname_logged});
                 }
                 else
@@ -429,6 +418,35 @@ function checkNewUserData(data)
 io.on('connection', function(client){
   console.log('a user connected');
 
+  client.on('updateEvs', function(data) {
+        data = JSON.parse(data);
+
+        //TODO: CHECK FOR VALID USER MAKING MODIFICATIONS - NO SECURITY HERE FOR NOW
+
+        User.findOne({username: data["uname"]}, function(err, user) {
+
+          if (user)
+          {
+
+            user.events = JSON.stringify(data['events']);
+            user.save(function(err, funct) {
+                if(!err){
+                    console.dir("User Events Updated.");
+                } else {
+                    console.dir("Failed to save new user events: ");
+                    console.dir(err);
+                    client.emit('failedDB', "-1");
+                }
+            });
+          }
+          else
+          {
+              console.dir("User not found.");
+              client.emit('failedDB', "-1");
+          }
+        });
+    });
+
   client.on('register', function(data) {
         data = JSON.parse(data);
         console.log("THE DATA IS EQUAL TO: ");
@@ -447,8 +465,8 @@ io.on('connection', function(client){
           {//Username not taken
             var tutorB = data["type_of_user"] == "Yes" ? true : false;
             var adminB = false;
-            var freeTimesJSON = JSON.stringify(data["events"]);
-            var input_user = new User({name: data["name"], email: data["email"], username: data["username"], password: data["password"], tutor: tutorB, admin: adminB, subjects: data["subjects"], freeTimes: freeTimesJSON});
+            var eventsJSON = JSON.stringify(data["events"]);
+            var input_user = new User({name: data["name"], email: data["email"], username: data["username"], password: data["password"], tutor: tutorB, admin: adminB, subjects: data["subjects"], events: eventsJSON});
             console.log("This is the input_user:");
             console.log(input_user);
             input_user.save(function(err, funct) {
