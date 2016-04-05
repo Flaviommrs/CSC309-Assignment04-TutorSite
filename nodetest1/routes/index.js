@@ -299,7 +299,7 @@ router.get('/weekView&username=*', function(req, res, next) {
             if(user[0])
             {
                 var user_events = user[0].freeTimes;
-                res.render('weekview.html', {events: JSON.stringify(user_events)});
+                res.render('weekview.html', {events: JSON.stringify(user_events), uname: uname});
             }
             else
             {
