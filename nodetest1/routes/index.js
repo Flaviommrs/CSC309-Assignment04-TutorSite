@@ -405,6 +405,15 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
+/*
+Search cases:
+user looks for username
+user looks for name
+user looks subject
+
+recommmendation system based on rating 
+*/
+
 /* POST search page - find user. */
 var searchedTerm = null;
 var searchResults = null;
@@ -425,10 +434,12 @@ router.post('/searchFind', function(req, res, next){
             console.dir("Users not found");
             res.redirect('/data');
           } else {
-            console.dir("Users found");
-            console.dir(users);
-            searchResults = users;
-            res.redirect("/search");
+            User.find ({name: searchedTerm}, function(err, users) {
+              console.dir("Users found");
+              console.dir(users);
+              searchResults = users;
+              res.redirect("/search");
+            }
           }
         });
 
@@ -442,18 +453,8 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  /* Filter multiple user results */
-  if (searchResults != null){
-    var foundNames = [];
-    var foundUsernames = [];
 
-    for (i in searchResults) {
-      console.dir(searchResults[i].name);
-      foundNames.push(searchResults[i].name);
-      foundUsernames.push(searchResults[i].username);
-    }
-  }
-    res.render('search.html', {search: searchedTerm, name: foundNames, username: foundUsernames});
+    res.render('search.html', {search: searchedTerm, results: searchResults});
 });
 
 /* GET weekview page. */
