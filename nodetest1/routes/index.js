@@ -191,6 +191,8 @@ router.get('/message', function(req, res, next) {
         res.render('homepage_inital.html', {});
     }
 });
+
+/*Get message page from the logged user*/
 router.get('/message&username=*', function(req, res, next) {
 
     var secret = 'tutorMeSecretString';
@@ -565,7 +567,10 @@ io.on('connection', function(client){
 
         Chat.findOne({roomName: data.room}, function(err, chat){
 
-          var addMsg = chat.messages.slice(0);
+          var addmsg = [];
+          if(chat.messages){
+            var addMsg = chat.messages.slice(0);
+          }
           var newMessage = {msg:data.msg, sender:data.sender}
           addMsg.push(newMessage);
           chat.messages = addMsg;
