@@ -154,7 +154,7 @@ router.get('/homepage', function(req, res, next) {
 
 /* GET inbox page. */
 router.get('/inbox', function(req, res, next) {
-    res.render('inbox.html', {});
+    res.redirect('/message');
 });
 
 
@@ -173,7 +173,42 @@ router.get('/message', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('inbox.html', {userNameReceived: result});
+        User.find({username: result}, function(err, user) {
+            if (err) return console.error(err);
+            if(user[0])
+            {
+                var user = user[0];
+                var chats = user.chats;
+                var allTalks = {};
+                var listOfTalks = [];
+                for(var i = 0; i < chats.length; i++)
+                {
+                    var found = 0;
+                    var userTalkingTo = chats[i].user;
+                    Chat.find({roomName: chats[i].room}, function(err, chatFound) {
+                        found++;
+                        if(chatFound[0])
+                        {
+                            var lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
+                            var talk = {name: userTalkingTo, message: lastMsg, read: read};
+                            listOfTalks.push(talk);
+                        }
+                        if(found == chats.length)
+                        {
+                            allTalks.results = listOfTalks;
+                            res.render('inbox.html', {userNameReceived: result, allTalks: JSON.stringify(allTalks)});
+                        }
+                    });
+                }
+            }
+            else
+            {
+                res.writeHead(404, {"Content-Type": "text/html"});
+                res.write("not found");
+                res.end();
+            }
+        });
     }
     else
     {

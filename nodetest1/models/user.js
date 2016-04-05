@@ -14,7 +14,6 @@ var userSchema = new mongoose.Schema({
       zipcode: { type: String, default: "" },
   },
   subjects: [String],
-  freeTimes: { type: String, default: "" },
   events: { type: String, default: "" },
   fbID: { type: String, unique: false },
   chats: [{room: Number, user: String}], //CHECK THIS

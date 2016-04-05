@@ -3,7 +3,7 @@
 	<!--Head Info-->
 	  <head>
 	    <link rel="stylesheet" type="text/css" href="/stylesheets/inboxstyle.css">
-	    <title>Tutor Me</title>
+	    <title>Tutor Me - INBOX</title>
 	    <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 	  </head>
 
@@ -40,10 +40,7 @@
 			var div = document.getElementById('display');
 			var table = document.createElement('TABLE');
 
-			var file = '{"results":[' +
-			'{"name": "Jason","message": "hello. how are you doing today sir? kdasopdkopsakdopaskdopaskpodksaopdkasopkdopsakdopaskopdkasopdkapso", "read":0},'+
-			'{"name": "Jason2","message": "hello. how are you doing today sir?", "read":0},'+
-			'{"name": "Alphonse","message": "hello!!!! lorem ipsum!!!!", "read":1}]}';
+			var file = <%- JSON.stringify(allTalks) %>;
 			var json = JSON.parse(file);
 
 			var i = 0;
@@ -80,11 +77,14 @@
 
 				var moreButton = document.createElement('BUTTON');
 				moreButton.innerHTML = "VIEW";
-				more.appendChild(moreButton);
 
-				moreButton.onclick = function(){
-
+				moreButton.id = 'BTN' + json.results[i].name;
+				moreButton.onclick = function()
+				{
+					window.location.href = "/message&username=" + this.id.substring(3);
 				}
+
+				more.appendChild(moreButton);
 
 			}
 
