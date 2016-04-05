@@ -43,7 +43,31 @@
             //defaultDate: '2016-01-12',
 			editable: false,
             eventLimit: true, // allow "more" link when too many events
-            events: eventsReceived
+            events: eventsReceived,
+
+            eventClick: function(calEvent, jsEvent, view) {
+
+                if(calEvent.title != "Available Slot")
+                {
+                    alert("Sorry. This slot is not available.");
+                    return;
+                }
+
+                //Change the border color of the event to red
+                $(this).css('border-color', 'red');
+
+                if(confirm("Do you want to reserve this timeslot?")){
+                    //Mark event as reserved
+                    calEvent.title = <%- JSON.stringify(uname_logged) %>;
+                    calEvent.color = '#EF6C00';
+                    $('#calendar').fullCalendar('updateEvent', calEvent);
+                    //TODO: Save changes to database here
+                }
+                //return border to previous color
+
+                $(this).css('border-color', '#3a87ad');
+            }
+
 		});
 
 	});

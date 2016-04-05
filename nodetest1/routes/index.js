@@ -285,29 +285,43 @@ router.get('/weekView', function(req, res, next) {
     }
 });
 router.get('/weekView&username=*', function(req, res, next) {
-    if(req.url.length <= 19)
+
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
     {
-        res.writeHead(404, {"Content-Type": "text/html"});
-        res.write("not found");
-        res.end();
+        res.redirect('/');
+    }
+    var uname_logged = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(uname_logged)
+    {
+        if(req.url.length <= 19)
+        {
+            res.writeHead(404, {"Content-Type": "text/html"});
+            res.write("not found");
+            res.end();
+        }
+        else
+        {
+            var uname = req.url.substring(19);
+            User.find({username: uname}, function(err, user) {
+                if (err) return console.error(err);
+                if(user[0])
+                {
+                    var user_events = user[0].freeTimes;
+                    res.render('weekview.html', {events: JSON.stringify(user_events), uname: uname, uname_logged: uname_logged});
+                }
+                else
+                {
+                    res.writeHead(404, {"Content-Type": "text/html"});
+                    res.write("not found");
+                    res.end();
+                }
+            });
+        }
     }
     else
     {
-        var uname = req.url.substring(19);
-        User.find({username: uname}, function(err, user) {
-            if (err) return console.error(err);
-            if(user[0])
-            {
-                var user_events = user[0].freeTimes;
-                res.render('weekview.html', {events: JSON.stringify(user_events), uname: uname});
-            }
-            else
-            {
-                res.writeHead(404, {"Content-Type": "text/html"});
-                res.write("not found");
-                res.end();
-            }
-        });
+        res.redirect('/');
     }
 
 });
