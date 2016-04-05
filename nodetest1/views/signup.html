@@ -133,6 +133,9 @@
             for (var i = 0; i < myEvents.length; i++)
             {
                 var newEvent = {};
+                // OCCUPIED EVENT = #EF6C00
+                // FREE SLOT = #3a87ad;
+                newEvent.color = '#3a87ad';
                 newEvent.title = "Available Slot";
                 newEvent.start = myEvents[i].start;
                 if(myEvents[i].end == null){
