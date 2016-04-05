@@ -250,7 +250,33 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var comment = new Review({reviewee: 'tester', name: req.body.realname, username: req.body.uname, password: req.body.pword});
+  var rating_var = null;
+
+  if (req.body.star1 != undefined){
+    console.dir(req.body.star1);
+    rating_var = 1;
+  };
+
+    if (req.body.star2 != undefined){
+    console.dir(req.body.star2);
+    rating_var = 2;
+  };
+    if (req.body.star3 != undefined){
+    console.dir(req.body.star3);
+    rating_var = 3;
+  };
+    if (req.body.star4 != undefined){
+    console.dir(req.body.star4);
+    rating_var = 4;
+  };
+    if (req.body.star5 != undefined){
+    console.dir(req.body.star5);
+    rating_var = 5;
+  };
+
+
+  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
