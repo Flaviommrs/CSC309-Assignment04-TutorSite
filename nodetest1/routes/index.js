@@ -27,24 +27,11 @@ router.get('/data', function(req, res, next) {
     });
 });
 
-//COOKIE TESTER PAGE
-router.get('/cookiesignread', function(req, res, next) {
-    console.dir(cookieSign.unsign(req.cookies.testingSign, 'tobiiscool'));
-    res.redirect('/');
-});
-//COOKIE TESTER PAGE
-router.get('/cookiesign', function(req, res, next) {
-    var val = cookieSign.sign('hello', 'tobiiscool');
-    res.clearCookie('testingSign');
-    res.cookie('testingSign' , val, {expire : new Date() + 9999}).send('Cookie is set');
-});
-
-
-//COOKIE TESTER PAGE
-router.get('/cookie', function(req, res, next) {
+//LOGOUT PAGE
+router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
     res.clearCookie('MyCookie');
-    res.cookie('MyCookie' , 'cookie_value123', {expire : new Date() + 9999}).send('Cookie is set');
+    res.redirect('/');
 });
 
 /* Test from html file input to server to database */
