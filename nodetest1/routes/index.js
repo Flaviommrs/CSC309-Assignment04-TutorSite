@@ -18,16 +18,6 @@ var Chat = require('../models/chat');
 var Review = require('../models/reviews');
 var currentUser = null;
 
-//DB TESTER PAGE
-router.get('/data', function(req, res, next) {
-
-    User.find({}, function(err, batman) {
-        if (err) return console.error(err);
-        console.dir("Retrived file from db.");
-        res.render('index.html', {group: batman});
-    });
-});
-
 //LOGOUT PAGE
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
@@ -54,15 +44,7 @@ router.post('/usernameTest', function(req, res, next){
 
       });
     }
-      res.redirect('/data');
-  });
-});
-
-/* Test from html file input to server to database */
-router.post('/cleardb', function(req, res, next){
-  User.remove({}, function(err) {
-    console.log('collection removed')
-    res.redirect('/data');
+      res.redirect('/admin/users');
   });
 });
 
@@ -159,7 +141,8 @@ router.get('/fbsignup', function (req, res, next){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('homepage_inital.html', {});
+  res.render('homepage', {});
+  //res.render('homepage_inital.html', {});
 });
 
 /* GET admin page. */
@@ -556,6 +539,12 @@ router.get('/message', function(req, res, next) {
                 var chats = user.chats;
                 var allTalks = {};
                 var listOfTalks = [];
+
+                if(chats.length == 0)
+                {
+                    res.render('inbox.html', {userNameReceived: result, allTalks: null});
+                }
+
                 for(var i = 0; i < chats.length; i++)
                 {
                     var found = 0;
@@ -564,7 +553,11 @@ router.get('/message', function(req, res, next) {
                         found++;
                         if(chatFound[0])
                         {
-                            var lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            var lastMsg = "";
+                            if(chatFound[0].messages.length != 0)
+                            {
+                                lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            }
                             var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
                             var talk = {name: userTalkingTo, message: lastMsg, read: read};
                             listOfTalks.push(talk);
@@ -779,7 +772,7 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
     price: resultPrice, subject: resultSubject});
 });
 
