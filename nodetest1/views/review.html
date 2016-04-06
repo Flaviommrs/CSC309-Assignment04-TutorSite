@@ -18,16 +18,14 @@
       </form>
     </div>
 
-    <div>
 
-      <h1> Review Your Tutor!!</h1>
+  <h1> Review Your Tutor!</h1>
 
-    </div>
 
   <form action="/addReview" method='post'>
-    <div>
-      <p>Username: <input type="text" name="tutName" placeholder="Tutor Name"></p>
-      
+
+    <div class="tutusename">
+      <p>Username: <input type="text" name="tutName" placeholder="Tutor's Username"></p>
     </div>
 
     <div id="rating">
@@ -59,11 +57,13 @@
 </span>
 
     <div class="comentaries">
-      <p>Comentaries:</p>
-      <input type="text" id="comment" name="comment" placeholder="Comment here...">
+      <p>Review:</p>
+      <textarea type="text" id="comment" name="comment" rows="4" cols="50" placeholder="Enter your comment here."></textarea>
+      <button id="rev_btn" type="submit">Submit</button>
     </div>
-    <button id="rev_btn" type="submit">Submit</button>
+
   </form>
+
 
   </body>
 

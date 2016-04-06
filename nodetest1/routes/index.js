@@ -537,7 +537,7 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  var comment = new Review({reviewee: req.body.tutName, reviewer: currentUser,
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
