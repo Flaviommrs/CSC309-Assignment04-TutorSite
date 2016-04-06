@@ -16,7 +16,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
-var currentUser = null;
+var currentUser = "ds";
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -397,6 +397,13 @@ router.post('/editingProfile', function(req, res, next){
     });
   }
 
+  if (req.body.tutors != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{subjects:req.body.tutors.split(",")}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
   if (req.body.rate != '') {
     console.dir("in if");
     User.update({username:currentUser}, {$set:{rate:req.body.rate}}, function(err, result) {
@@ -617,8 +624,29 @@ router.post('/addReview', function(req, res, next){
 });
 
 /* GET review page. */
-router.get('/review', function(req, res, next) {
-    res.render('review.html', {});
+router.get('/reviewuser=*', function(req, res, next) {
+  console.log(req.url);
+    if(req.url.length <= 12)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
+    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        if(user[0])
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write(JSON.stringify(user));
+        }
+        else
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write("not found");
+        }
+        res.end();
+    });
 });
 
 /*
@@ -789,7 +817,7 @@ router.get('/username=*', function(req, res, next) {
         }
         else
         {
-            res.writeHead(404, {"Content-Type": "text/html"});
+            res.writeHead(200, {"Content-Type": "text/html"});
             res.write("not found");
         }
         res.end();

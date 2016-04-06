@@ -232,19 +232,18 @@ border-radius: 3px 0 0 3px;
 
 .inline > * {
     display: inline-block;
+    vertical-align: top;
 }
 
 #profileinfo {
     margin-left: 20px;
     width: 40%;
     position: relative;
-    top: -205px;
 }
 
 #tutorinfo {
     width: 300px;
     position: relative;
-    top: -60px;
 }
 
 #reviews {
@@ -295,7 +294,6 @@ border-radius: 3px 0 0 3px;
 .rightreview {
     width: 50%;
     position: relative;
-    top: -150px;
 }
 
 .button {
@@ -330,4 +328,8 @@ border-radius: 3px 0 0 3px;
 .center {
     margin-left: auto;
     margin-right: auto;
+}
+
+.bold {
+    font-weight: bold;
 }
