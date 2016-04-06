@@ -17,6 +17,7 @@
     "serve-favicon": "~2.3.0",
     "monk": "^1.0.1",
     "connect": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "compression": "~1.6.1"
   }
 }
