@@ -1,3 +1,7 @@
+@import url(https://fonts.googleapis.com/css?family=Noto+Sans);
+@import url(https://fonts.googleapis.com/css?family=Francois+One);
+@import url(https://fonts.googleapis.com/css?family=Bree+Serif);
+
 body {
     height:100%;
     background-color: #ffffff;
@@ -13,16 +17,19 @@ html {
 
 h1 {
     padding: 10px;
+    font-family: 'Francois One', sans-serif;
 }
 
 h2 {
     text-align: center;
     padding-top: 100px;
     color: white;
+    font-family: 'Bree Serif', serif;
 }
 
 p {
     padding: 10px;
+    font-family: 'Noto Sans', sans-serif;
 }
 
 /* Header Styles */
@@ -167,12 +174,25 @@ border-radius: 3px 0 0 3px;
 }
 
 .button {
-    background-color: #aaaaaa; /* Green */
+    background-color: #aaaaaa; 
     border: none;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    font-size: 25px;
+    width: 30%;
+    height: 100px;
+    border-radius: 15px;
+}
+
+.fb_button {
+    background-color: #3b5998; 
+    color: white;
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+    text-decoration: none;
     font-size: 25px;
     width: 30%;
     height: 100px;

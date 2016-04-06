@@ -16,6 +16,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
+var currentUser = null;
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -83,6 +84,7 @@ router.post('/LoginAuthentication', function(req, res, next){
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
+        currentUser = log_username;
         //SAVE THE COOKIE
         //var userData = {username: user.username};
         //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
@@ -101,22 +103,347 @@ router.post('/LoginAuthentication', function(req, res, next){
 
 });
 
+router.post('/facebookLog', function(req, res, next){
+
+  var log_username = req.body.username;
+
+  var secret = 'tutorMeSecretString';
+  var val = cookieSign.sign(log_username, secret);
+  res.clearCookie('tutorMeData');
+  res.cookie('tutorMeData' , val, {expire : new Date() + 9999});
+
+  res.redirect('/homepage');
+
+});
+
+router.post('/facebookSignUp',function (req, res, next){
+
+
+  var username = req.body.username;
+  var password = req.body.password;
+  var name = req.body.name;
+  var email = req.body.email;
+
+  console.log(username,password, name, email);
+
+  User.findOne({username: username}, function (err, user) {
+
+    if (!user)
+    {//Username not taken
+      var input_user = new User({name:username, email:email, username: username, password: password});
+      console.log("This is the input_user:");
+      console.log(input_user);
+      input_user.save(function(err, funct) {
+          if(!err){
+              console.dir("New User Saved.");
+          } else {
+              console.dir("Failed to save user: ");
+              console.dir(err);
+          }
+      });
+    }
+    else
+    {
+
+    }
+  });
+
+  res.redirect('/fbsignup');
+});
+
+router.get('/fbsignup', function (req, res, next){
+
+  res.render('signup.html', {});
+
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('homepage_inital.html', {});
 });
+
+/* GET admin page. */
+router.get('/admin', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  res.render('admin.html', {result: true, info: null});
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/* GET admin page. */
+router.get('/admin/users', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  User.find({}, function(err, db_data) {
+                      if (err) return console.error(err);
+                      res.render('admin.html', {result: true, info: db_data});
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/* GET admin page. */
+router.get('/admin/chat', function(req, res, next) {
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  Chat.find({}, function(err, db_data) {
+                      if (err) return console.error(err);
+                      res.render('admin.html', {result: true, info: db_data});
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/*DELETE USER FROM DB*/
+router.get('/admin/delete&username=*', function(req, res, next) {
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/users');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  var userToDelete = req.url.substring(23);
+                  User.remove({ username: userToDelete }, function(err) {
+                    res.redirect('/admin/users');
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/*DELETE CHATROOM FROM DB*/
+router.get('/admin/delete&roomname=*', function(req, res, next) {
+    console.log("Right where I should be");
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/chat');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  try
+                  {
+                        var chatToDelete = parseInt(req.url.substring(23));
+                        Chat.remove({ roomName: chatToDelete }, function(err) {
+                          res.redirect('/admin/chat');
+                        });
+                  } catch (e)
+                  {
+                      res.redirect('/admin/chat');
+                  }
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
     res.render('signup.html', {});
 });
 
-/* GET edit profile page. */
-router.get('/editProfile', function(req, res, next) {
-    res.render('editprofile.html', {});
+
+//POST for edit profile
+router.post('/editingProfile', function(req, res, next){
+  console.dir(req.body.number);
+
+  if (req.body.name != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{name:req.body.name}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.number != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{phone:req.body.number}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.email != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{email:req.body.email}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.rate != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{rate:req.body.rate}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.occupation != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{occupation:req.body.occupation}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.education != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{education:req.body.education}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.experience != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{experience:req.body.experience}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.about != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{about:req.body.about}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  res.redirect("/profile&username=" + currentUser);
+
 });
 
-/* GET fb login page. */
+/* GET edit profile page. */
+router.get('/editProfile', function(req, res, next) {
+  User.findOne({username: currentUser}, function(err, user) {
+    res.render('editprofile.html', {userinfo: user});
+  });
+});
+
+/* GET fb login page. Test*/
 router.get('/facebookLog', function(req, res, next) {
     res.render('facebookLog.html', {});
 });
@@ -131,7 +458,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {});
+        res.render('homepage_user.html', {current: currentUser});
     }
     else
     {
@@ -250,7 +577,7 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var rating_var = null;
+  var rating_var = 0;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
@@ -275,7 +602,7 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  var comment = new Review({reviewee: req.body.tutName, reviewer: currentUser,
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
@@ -298,52 +625,78 @@ router.get('/review', function(req, res, next) {
 Search cases:
 user looks for username
 user looks for name
+user looks for area
+user look for price
 user looks subject
 
-recommmendation system based on rating 
+recommmendation system based on rating
 */
 
-/* POST search page - find user. */
+/* POST search page */
 var searchedTerm = null;
-var searchResults = null;
+var resultUsername = null;
+var resultNames = null;
+var resultPrice = null;
+var resultSubject = null;
+var reccommened = null;
 
-/* Search Results - search usernames */
 router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
   console.dir(searchedTerm);
 
-  //Find user based on username - should result in one user
+  /* Find username */
   User.findOne({username: searchedTerm}, function(err, user) {
-    if (user == null){ //username not found
-      console.dir("User not found - searching names");
-
-        //Find the real name of the user
-        User.find ({name: searchedTerm}, function(err, users) {
-          if (users.length == 0) {
-            console.dir("Users not found");
-            res.redirect('/data');
-          } else {
-            User.find ({name: searchedTerm}, function(err, users) {
-              console.dir("Users found");
-              console.dir(users);
-              searchResults = users;
-              res.redirect("/search");
-            }
-          }
-        });
-
-    } else {
-        console.dir("User found");
-        searchResults = user;
-        res.redirect("/profile&username=" + searchedTerm);
-    }
+    resultUsername = user;
+    //console.dir(resultUsername);
+    return;
   });
-})
+
+  User.find({name: searchedTerm}, function(err, name) {
+    resultNames = name;
+    //console.dir(resultNames);
+    return;
+  });
+
+  User.find({rate: searchedTerm}, function(err, price) {
+    resultPrice = price;
+    //console.dir(resultPrice);
+    return;
+  });
+
+  User.find({subjects: { $in: [searchedTerm] }}, function(err, subject) {
+    resultSubject = subject;
+    //console.dir(resultSubject);
+    return;
+  });
+
+  /* Recommended feature */
+
+
+  res.redirect('/search');
+
+});
+
+//Subject Searchs
+router.post('/searchSubject', function(req, res, next){
+  User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+    resultSubject = subject;
+    //console.dir(resultSubject);
+    return;
+  });
+
+  res.redirect('/search');
+});
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
+  console.dir(searchedTerm);
+  console.dir(resultUsername);
+  console.dir(resultNames);
+  console.dir(resultPrice);
+  console.dir(resultSubject);
 
-    res.render('search.html', {search: searchedTerm, results: searchResults});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
+    price: resultPrice, subject: resultSubject});
 });
 
 /* GET weekview page. */
@@ -469,6 +822,38 @@ function checkNewUserData(data)
 io.on('connection', function(client){
   console.log('a user connected');
 
+  client.on('updateDBEntryUser', function(data) {
+        data = JSON.parse(data);
+
+        //TODO CHECK FOR VALID USER MAKING MODIFICATIONS - NO SECURITY HERE FOR NOW
+
+        User.findOne({_id: data["_id"]}, function(err, user) {
+
+          if (user)
+          {
+                for(var propertyName in data) {
+                   user[propertyName] = data[propertyName];
+                }
+                console.dir(user);
+                user.save(function(err, funct) {
+                    if(!err){
+                        console.dir("User Updated.");
+                        client.emit('success', "0");
+                    } else {
+                        console.dir("Failed to update user");
+                        console.dir(err);
+                        client.emit('failedDB', "-1");
+                    }
+                });
+          }
+          else
+          {
+              console.dir("User not found.");
+              client.emit('failedDB', "-1");
+          }
+        });
+    });
+
   client.on('updateEvs', function(data) {
         data = JSON.parse(data);
 
@@ -545,7 +930,7 @@ io.on('connection', function(client){
 
       if (!user) {//Username not taken
 
-        console.log("no user with that name");
+        console.log("no user with that name", err);
 
       }else{
 

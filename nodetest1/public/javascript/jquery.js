@@ -7,10 +7,17 @@ function seeSched()
         window.location.href = '/weekView&username=' + uname;
     }
 }
+<<<<<<< HEAD
 
 function seeMsg()
+=======
+function sendMsg()
+>>>>>>> Flaviommrs/master
 {
-    //TODO!
+    if(uname != "")
+    {
+            window.location.href = '/message&username=' + uname;
+    }
 }
 
 function loadUser(username) {
