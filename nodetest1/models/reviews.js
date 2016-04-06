@@ -5,6 +5,7 @@ var reviewSchema = new mongoose.Schema({
   reviewer : {type: String, required: true},
   rating : {type: Number, default: 0},
   likes: {type: Number, default: 0},
+  likelist: [String],
   commented : {type: String, default: ""}
 });
 
