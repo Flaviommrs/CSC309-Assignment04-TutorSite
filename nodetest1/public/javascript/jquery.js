@@ -7,9 +7,12 @@ function seeSched()
             window.location.href = '/weekView&username=' + uname;
     }
 }
-function seeMsg()
+function sendMsg()
 {
-    //TODO!
+    if(uname != "")
+    {
+            window.location.href = '/message&username=' + uname;
+    }
 }
 
 function loadUser(username) {
