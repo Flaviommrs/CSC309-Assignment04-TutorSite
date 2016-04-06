@@ -131,5 +131,8 @@ function loadReviews(username) {
     });
 };
 
-loadUser(window.location.pathname.substring(18));
-loadReviews(window.location.pathname.substring(18));
+var uname = decodeURIComponent(window.location.pathname.substring(18));
+
+loadUser(uname);
+
+loadReviews(uname);
