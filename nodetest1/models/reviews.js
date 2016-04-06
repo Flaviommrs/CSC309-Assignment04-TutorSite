@@ -6,7 +6,8 @@ var reviewSchema = new mongoose.Schema({
   rating : {type: Number, default: 0},
   likes: {type: Number, default: 0},
   likelist: {type:[String], default:[]},
-  commented : {type: String, default: ""}
+  commented : {type: String, default: ""},
+  picture: { type:String, default:""}
 });
 
 var Review = mongoose.model('Review', reviewSchema);

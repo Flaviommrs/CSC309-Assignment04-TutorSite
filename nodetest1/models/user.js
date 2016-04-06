@@ -8,7 +8,7 @@ var userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   tutor: { type: Boolean, default: false },
   admin: { type: Boolean, default: false },
-  picture: String, //URL to the picture address
+  picture: { type: String, default: "" }, //URL to the picture address
   country: { type: String, default: "" },
   city: { type: String, default: "" },
   zipcode: { type: String, default: "" },
