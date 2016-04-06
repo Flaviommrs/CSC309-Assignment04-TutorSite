@@ -775,11 +775,7 @@ router.post('/searchFind', function(req, res, next){
     return;
   });
 
-  User.find({rate: searchedTerm, tutor: true}, function(err, price) {
-    resultPrice = price;
-    //console.dir(resultPrice);
-    return;
-  });
+  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
 
   User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
     resultSubject = subject;
