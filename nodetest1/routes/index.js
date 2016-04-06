@@ -354,9 +354,142 @@ router.get('/signup', function(req, res, next) {
     res.render('signup.html', {});
 });
 
+//POST for edit profile
+router.post('/editingProfile', function(req, res, next){
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+
+  if (req.body.name != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{name:req.body.name}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.number != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{phone:req.body.number}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.email != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{email:req.body.email}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.rate != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{rate:req.body.rate}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.occupation != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{occupation:req.body.occupation}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.education != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{education:req.body.education}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.experience != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{experience:req.body.experience}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.about != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{about:req.body.about}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.city != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{city:req.body.city}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.country != '') {
+    console.dir("in if");
+    User.update({username:result}, {$set:{country:req.body.country}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  var subject_update = []
+if (req.body.none == undefined){
+  if (req.body.math != undefined) {
+    subject_update.push(req.body.math);
+  }
+
+  if (req.body.biology != undefined) {
+    subject_update.push(req.body.biology);
+  }
+
+  if (req.body.chemistry != undefined) {
+    subject_update.push(req.body.chemistry);
+  }
+
+  if (req.body.physics != undefined) {
+    subject_update.push(req.body.physics);
+  }
+
+  if (req.body.geography != undefined) {
+    subject_update.push(req.body.geography);
+  }
+
+  if (req.body.english != undefined) {
+    subject_update.push(req.body.english);
+  }
+
+  if (req.body.hist != undefined) {
+    subject_update.push(req.body.hist);
+  }
+}
+
+  if (subject_update.length > 0) {
+    User.update({username:result}, {$set:{subjects:subject_update}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.none != undefined) {
+    User.update({username:result}, {$set:{subjects:[]}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  res.redirect("/profile&username=" + result);
+  }
+});
+
 /* GET edit profile page. */
 router.get('/editProfile', function(req, res, next) {
-    res.render('editprofile.html', {});
+  var secret = 'tutorMeSecretString';
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+      res.render('editprofile.html', {userinfo: result});
+    }
 });
 
 /* GET fb login page. Test*/
@@ -602,6 +735,17 @@ router.post('/searchFind', function(req, res, next){
 
 });
 
+//Subject Searchs
+ router.post('/searchSubject', function(req, res, next){
+   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+     resultSubject = subject;
+     //console.dir(resultSubject);
+     return;
+   });
+ 
+   res.redirect('/search');
+ });
+
 /* GET search page. */
 router.get('/search', function(req, res, next) {
   console.dir(searchedTerm);
@@ -610,8 +754,8 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}),
-    price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
+    price: resultPrice, subject: resultSubject});
 });
 
 /* GET weekview page. */
