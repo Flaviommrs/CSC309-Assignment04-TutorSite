@@ -232,6 +232,9 @@ border-radius: 3px 0 0 3px;
 
 .inline > * {
     display: inline-block;
+    vertical-align: top;
+    padding: 0;
+    margin: 0;
 }
 
 #profileinfo {
@@ -295,7 +298,6 @@ border-radius: 3px 0 0 3px;
 .rightreview {
     width: 50%;
     position: relative;
-    top: -150px;
 }
 
 .button {

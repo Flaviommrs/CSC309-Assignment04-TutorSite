@@ -674,8 +674,29 @@ router.post('/addReview', function(req, res, next){
 });
 
 /* GET review page. */
-router.get('/review', function(req, res, next) {
-    res.render('review.html', {});
+router.get('/reviewuser=*', function(req, res, next) {
+  console.log(req.url);
+    if(req.url.length <= 12)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
+    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        if(user[0])
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write(JSON.stringify(user));
+        }
+        else
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write("not found");
+        }
+        res.end();
+    });
 });
 
 /*

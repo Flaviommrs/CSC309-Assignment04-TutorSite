@@ -50,7 +50,43 @@ function loadUser(username) {
     });
 };
 
+function loadReviews(username) {
+    var request = $.ajax({
+        method: "GET",
+        url: "/reviewuser=" + username
+    });
+    request.done(function(msg) {
+        var json = JSON.parse(msg);
+        document.getElementById("reviews").innerHTML += `<p>REVIEWS</p>`
+        for (review in json){
+            var string = `<div class="review">
+                    <div class="inline review-content">
+                        <div class="leftreview">
+                            <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
+                        </div>
+                        <div class="rightreview">
+                            <p>Rating: ` + json["rating"] + `</p>
+                            <p> ` + json["commented"] + `</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p> ` + json["reviewer"] + `</p>
+                    </div>
+                    <div class="right">
+                        <button class="ratereview">Useful</button>
+                        <button class="ratereview">Not Useful</button>
+                    </div>
+                </div>`;
+            document.getElementById("reviews").innerHTML += string;
+        }
+    });
+    request.fail(function( jqXHR, textStatus ) {
+        alert( "Request failed: " + textStatus );
+    });
+};
+
 if(window.location.pathname.length > 18)
 {
-        loadUser(window.location.pathname.substring(18));
+    loadUser(window.location.pathname.substring(18));
+    loadReviews(window.location.pathname.substring(18));
 }
