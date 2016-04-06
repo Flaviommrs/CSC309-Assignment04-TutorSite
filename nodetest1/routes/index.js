@@ -637,8 +637,17 @@ router.get('/message&username=*', function(req, res, next) {
 router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
 
-  var rating_var = null;
+  var rating_var = 0;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
@@ -663,18 +672,26 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  var comment = new Review({reviewee: req.body.tutName, reviewer: result,
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
       console.dir("New comment.");
+
+      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, up) {
+      });
+
+      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, up) {
+      });
+
       res.redirect("/profile&username=" + req.body.tutName);
     } else {
         console.dir("Failed to save comment ");
         console.dir(err);
     }
   });
+}
 });
 
 /* POST edit store review data. */
@@ -730,17 +747,6 @@ router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
 
-/*
-Search cases:
-user looks for username
-user looks for name
-user looks for area
-user look for price
-user looks subject
-
-recommmendation system based on rating
-*/
-
 /* POST search page */
 var searchedTerm = null;
 var resultUsername = null;
@@ -748,10 +754,11 @@ var resultNames = null;
 var resultPrice = null;
 var resultSubject = null;
 var reccommened = null;
+var sameLocation = null;
 
 router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
-  console.dir(searchedTerm);
+  //console.dir(searchedTerm);
 
   /* Find username */
   User.findOne({username: searchedTerm}, function(err, user) {
@@ -759,6 +766,7 @@ router.post('/searchFind', function(req, res, next){
     //console.dir(resultUsername);
     return;
   });
+
 
   User.find({name: searchedTerm}, function(err, name) {
     resultNames = name;
@@ -779,16 +787,32 @@ router.post('/searchFind', function(req, res, next){
   });
 
   /* Recommended feature */
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    //Find current user location
+    User.find({username: result}, function(err, user) {
+      console.dir(user[0].city);
+      User.find({city: user[0].city, country: user[0].country}, function(err, location) {
+        sameLocation = location;
+      });
+    });
 
-
-  res.redirect('/search');
-
+    res.redirect('/search');
+  }
 });
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
    User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
      resultSubject = subject;
+     searchedTerm = req.body.subject;
      //console.dir(resultSubject);
      return;
    });
@@ -798,14 +822,14 @@ router.post('/searchFind', function(req, res, next){
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  console.dir(searchedTerm);
-  console.dir(resultUsername);
-  console.dir(resultNames);
-  console.dir(resultPrice);
-  console.dir(resultSubject);
+  //console.dir(searchedTerm);
+  //console.dir(resultUsername);
+  //console.dir(resultNames);
+  //console.dir(resultPrice);
+  //console.dir(resultSubject);
 
   res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
-    price: resultPrice, subject: resultSubject});
+    price: resultPrice, subject: resultSubject, location: sameLocation});
 });
 
 /* GET weekview page. */
