@@ -21,12 +21,12 @@ var currentUser = null;
 //LOGOUT PAGE
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
-    res.clearCookie('MyCookie');
     res.redirect('/');
 });
 
 /* Test from html file input to server to database */
 router.post('/usernameTest', function(req, res, next){
+
   console.dir(req.body.uname);
   console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
@@ -923,7 +923,7 @@ io.on('connection', function(client){
             }
         });
       }
-      else 
+      else
       {
           client.emit('user not find', "-1");
       }
