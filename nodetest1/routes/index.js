@@ -271,6 +271,100 @@ router.get('/admin/chat', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
+/*DELETE USER FROM DB*/
+router.get('/admin/delete&username=*', function(req, res, next) {
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/users');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  var userToDelete = req.url.substring(23);
+                  User.remove({ username: userToDelete }, function(err) {
+                    res.redirect('/admin/users');
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/*DELETE CHATROOM FROM DB*/
+router.get('/admin/delete&roomname=*', function(req, res, next) {
+    console.log("Right where I should be");
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/chat');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  try
+                  {
+                        var chatToDelete = parseInt(req.url.substring(23));
+                        Chat.remove({ roomName: chatToDelete }, function(err) {
+                          res.redirect('/admin/chat');
+                        });
+                  } catch (e)
+                  {
+                      res.redirect('/admin/chat');
+                  }
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+
+
+
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
@@ -523,8 +617,13 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
+<<<<<<< HEAD
   res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
     price: resultPrice, subject: resultSubject});
+=======
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}),
+    price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
+>>>>>>> origin/master
 });
 
 /* GET weekview page. */
@@ -649,6 +748,38 @@ function checkNewUserData(data)
 
 io.on('connection', function(client){
   console.log('a user connected');
+
+  client.on('updateDBEntryUser', function(data) {
+        data = JSON.parse(data);
+
+        //TODO CHECK FOR VALID USER MAKING MODIFICATIONS - NO SECURITY HERE FOR NOW
+
+        User.findOne({_id: data["_id"]}, function(err, user) {
+
+          if (user)
+          {
+                for(var propertyName in data) {
+                   user[propertyName] = data[propertyName];
+                }
+                console.dir(user);
+                user.save(function(err, funct) {
+                    if(!err){
+                        console.dir("User Updated.");
+                        client.emit('success', "0");
+                    } else {
+                        console.dir("Failed to update user");
+                        console.dir(err);
+                        client.emit('failedDB', "-1");
+                    }
+                });
+          }
+          else
+          {
+              console.dir("User not found.");
+              client.emit('failedDB', "-1");
+          }
+        });
+    });
 
   client.on('updateEvs', function(data) {
         data = JSON.parse(data);

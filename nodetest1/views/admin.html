@@ -9,8 +9,13 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/styleWeekView.css"> <!-- CHANGE TO ADMIN IF NEEDED -->
     <title>Tutor Me - Admin page</title>
     <link rel="icon" href="/images/favicon.png"> <!-- favicon not yet made -->
+    <script src="/javascript/socket.io/socket.io.js"></script>
 
     <script>
+
+        var USERPAGE = 1;
+        var CHATPAGE = 2;
+        var pageType = 0;
 
 
         function updateSelection()
@@ -36,7 +41,6 @@
                 usersButton.id = 'BTNUSERS';
                 usersButton.onclick = function()
 				{
-                    //TODO
 					window.location.href = '/admin/users';
 				}
                 var chatsButton = document.createElement('BUTTON');
@@ -44,7 +48,6 @@
                 chatsButton.id = 'BTNCHATS';
                 chatsButton.onclick = function()
 				{
-					//TODO
                     window.location.href = '/admin/chat';
 				}
                 div.appendChild(usersButton);
@@ -62,14 +65,63 @@
                         if(info[i].username == undefined)
                         {
                             newOption.innerHTML = info[i].roomName;
+                            pageType = CHATPAGE;
                         }
                         else
                         {
                             newOption.innerHTML = info[i].username;
+                            pageType = USERPAGE;
                         }
 
                         div.appendChild(newOption);
                     }
+                    div = document.getElementById('modifyDB');
+                    var deleteButton = document.createElement('BUTTON');
+                    deleteButton.innerHTML = "DELETE";
+                    deleteButton.id = 'BTNDELETE';
+                    deleteButton.onclick = function()
+    				{
+                        if(pageType == USERPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&username=' + selectedE.value;
+                        }
+                        else if(pageType == CHATPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&roomname=' + selectedE.value;
+                        }
+    				}
+                    var updateButton = document.createElement('BUTTON');
+                    updateButton.innerHTML = "UPDATE";
+                    updateButton.id = 'BTNUPDATE';
+                    updateButton.onclick = function()
+    				{
+                        var socket = io.connect('http://localhost:4200');
+                        socket.on('connect', function(data) {
+                            var elemInfo = document.getElementById('elemInfo');
+                            var myJSONObj = JSON.parse(elemInfo.value);
+                            if(pageType == USERPAGE)
+                            {
+                                socket.emit('updateDBEntryUser', JSON.stringify(myJSONObj));
+                            }
+                            else if(pageType == CHATPAGE)
+                            {
+                                socket.emit('updateDBEntryChat', JSON.stringify(myJSONObj));
+                            }
+                            socket.on('failedDB', function(data) {
+                                alert("Some unexpected problem happened on saving your data. Please try again.");
+                            });
+                            socket.on('success', function(data) {
+                                alert("Data updated.");
+                            });
+                        });
+    				}
+                    div.appendChild(deleteButton);
+                    div.appendChild(updateButton);
+
                 }
 
 
@@ -97,10 +149,23 @@
 <select onChange='updateSelection()' id ="DBinfo">
 
 </select>
+<br/>
+<br/>
+<textarea rows=10 cols=100 id='elemInfo'></textarea>
+<br/>
+<br/>
+<div id="modifyDB">
 
-<span id='elemInfo'>
-
-</span>
+</div>
+<br/>
+<br/>
+<h1>Insert new dummy user</h1>
+<form method="post" action="/usernameTest" class="search-wrapper cf">
+    <input style="margin-right: 5px" type="text" name="realname" placeholder="Name" required="">
+    <input style="margin-right: 5px" type="text" name="uname" placeholder="Username" required="">
+    <input style="margin-right: 5px" type="text" name="pword" placeholder="Password" required="">
+    <button type="submit">Sign Up</button>
+</form>
 
 </div>
 
