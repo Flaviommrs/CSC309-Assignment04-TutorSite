@@ -123,18 +123,19 @@ router.post('/facebookSignUp',function (req, res, next){
           }
       });
     }
-    else
-    {
 
-    }
   });
 
-  res.redirect('/fbsignup');
+  res.redirect('/fbsignup&username=' + username);
 });
 
-router.get('/fbsignup', function (req, res, next){
+router.get('/fbsignup&username=*', function (req, res, next){
 
-  res.render('signup.html', {});
+
+  var username = req.url.substring(19);
+  console.log(username);
+
+  res.render('fbsignup.html', {username: username});
 
 });
 
@@ -881,6 +882,54 @@ function checkNewUserData(data)
 
 io.on('connection', function(client){
   console.log('a user connected');
+
+  client.on('fb', function(data){
+
+    data = JSON.parse(data);
+    console.log("THE DATA IS EQUAL TO: ");
+    console.log(data);
+
+    // if(!checkNewUserData(data))
+    // {
+    //     console.log("Invalid user data");
+    //     client.emit('invalidData', "-1");
+    //     return;
+    // }
+
+    User.findOne({username: data["username"]}, function(err, user) {
+
+      if (user)
+      {//Username not taken
+        console.log("it is in ");
+        var tutorB = data["type_of_user"] == "Yes" ? true : false;
+        var adminB = false;
+        var eventsJSON = JSON.stringify(data["events"]);
+
+        user.tutor = tutorB;
+        user.admin = adminB;
+        user.subjects = data["subjects"];
+        user.events = eventsJSON;
+
+        console.log("This is the user:");
+        console.log(user);
+        user.save(function(err, funct) {
+            if(!err){
+                console.dir("New User Saved.");
+                client.emit('success', "0");
+            } else {
+                console.dir("Failed to save user: ");
+                console.dir(err);
+                client.emit('failedDB', "-1");
+            }
+        });
+      }
+      else 
+      {
+          client.emit('user not find', "-1");
+      }
+    });
+
+  });
 
   client.on('updateDBEntryUser', function(data) {
         data = JSON.parse(data);
