@@ -1,4 +1,4 @@
-var uname = "";
+var uname = decodeURIComponent(window.location.pathname.substring(18));
 
 function seeSched() {
     if(uname != "") {
@@ -52,7 +52,6 @@ function loadUser(username) {
 
     request.done(function(msg) {
         var json = JSON.parse(msg);
-        uname = json["username"];
 
         if (json["picture"] != ""){
             document.getElementById("profilepic").src = json["picture"];
@@ -131,8 +130,5 @@ function loadReviews(username) {
     });
 };
 
-var uname = decodeURIComponent(window.location.pathname.substring(18));
-
 loadUser(uname);
-
 loadReviews(uname);

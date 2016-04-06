@@ -704,9 +704,14 @@ router.post('/addReview', function(req, res, next){
     rating_var = 5;
   };
 
+  var pic = "";
+  User.find({username: result}, function(err, user) {
+    if (err) return console.error(err);
+    pic = user["picture"];
+  });
 
   var comment = new Review({reviewee: req.body.tutName, reviewer: result,
-  rating: rating_var, commented: req.body.comment});
+  rating: rating_var, commented: req.body.comment, picture: pic});
 
   comment.save(function(err, funct) {
     if(!err){
