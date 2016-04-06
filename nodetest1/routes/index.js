@@ -885,6 +885,30 @@ router.get('/search', function(req, res, next) {
     price: resultPrice, subject: resultSubject, location: sameLocation});
 });
 
+/* POST add picture page. */
+router.post('/addingPicture', function(req, res, next) {
+
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    User.update({username:result}, {$set:{picture:req.body.profPic}}, function(err, result) {
+      console.dir(req.body.profPic);
+    });
+    res.redirect("/profile&username=" + result);
+  }
+});
+
+/* GET add picture page. */
+router.get('/addPicture', function(req, res, next) {
+  res.render('add_pic.html', {});
+});
+
 /* GET weekview page. - gets the schedule of the user that is logged in */
 router.get('/weekView', function(req, res, next) {
     var secret = 'tutorMeSecretString';
