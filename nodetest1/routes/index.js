@@ -1,32 +1,33 @@
+//Requires
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var cookieSign = require('cookie-signature');
-
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+//instantiate the router
 var router = express.Router();
 
-
+//initialize database
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 
-//Get db model
+//Get db models
 var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
 var currentUser = null;
 
-//LOGOUT PAGE
+/* LOGOUT PAGE - DELETES THE COOKIE */
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
-    res.clearCookie('MyCookie');
-    res.redirect('/');
+    res.redirect('/homepage');
 });
 
-/* Test from html file input to server to database */
+/* Inserts new basic user to the database - used by admin page */
 router.post('/usernameTest', function(req, res, next){
+
   console.dir(req.body.uname);
   console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
@@ -48,7 +49,7 @@ router.post('/usernameTest', function(req, res, next){
   });
 });
 
-/* Login Authentication */
+/* Login Authentication - logic for signing user in */
 router.post('/LoginAuthentication', function(req, res, next){
   var log_username = req.body.username;
   var log_password = req.body.password;
@@ -61,14 +62,12 @@ router.post('/LoginAuthentication', function(req, res, next){
     //Password matches and go through
     if (user == null){ //user not found
       console.dir('user not found')
-      res.redirect('/');
+      res.redirect('/homepage');
     } else {
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
         //SAVE THE COOKIE
-        //var userData = {username: user.username};
-        //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
         var secret = 'tutorMeSecretString';
         var val = cookieSign.sign(user.username, secret);
         res.clearCookie('tutorMeData');
@@ -84,6 +83,7 @@ router.post('/LoginAuthentication', function(req, res, next){
 
 });
 
+/* Facebook login - logic for signing in user through facebook */
 router.post('/facebookLog', function(req, res, next){
 
   var log_username = req.body.username;
@@ -97,6 +97,7 @@ router.post('/facebookLog', function(req, res, next){
 
 });
 
+/* Facebook login - logic for signing up user through facebook */
 router.post('/facebookSignUp',function (req, res, next){
 
 
@@ -129,7 +130,6 @@ router.post('/facebookSignUp',function (req, res, next){
 
   res.redirect('/fbsignup&username=' + username);
 });
-
 router.get('/fbsignup&username=*', function (req, res, next){
 
 
@@ -144,7 +144,6 @@ router.get('/fbsignup&username=*', function (req, res, next){
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.redirect('/homepage');
-  //res.render('homepage_inital.html', {});
 });
 
 /* GET admin page. */
@@ -350,8 +349,31 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
     }
 });
 
-
-
+/* GET review page. */
+router.get('/reviewuser=*', function(req, res, next) {
+  console.log(req.url);
+    if(req.url.length <= 12)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
+    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        if(user[0])
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write(JSON.stringify(user));
+        }
+        else
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write("not found");
+        }
+        res.end();
+    });
+});
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
@@ -492,7 +514,9 @@ router.get('/editProfile', function(req, res, next) {
   var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-      res.render('editprofile.html', {userinfo: result});
+      User.findOne({username: result}, function(err, user) {
+        res.render('editprofile.html', {userinfo: user});
+      });
     }
 });
 
@@ -776,11 +800,7 @@ router.post('/searchFind', function(req, res, next){
     return;
   });
 
-  User.find({rate: searchedTerm, tutor: true}, function(err, price) {
-    resultPrice = price;
-    //console.dir(resultPrice);
-    return;
-  });
+  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
 
   User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
     resultSubject = subject;
@@ -921,7 +941,42 @@ router.get('/registration', function(req, res, next) {
 
 /* GET profile page. */
 router.get('/profile&username=*', function(req, res, next) {
-    res.render('profile.html', {});
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('homepage_inital.html', {});
+    }
+    var uname_logged = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(uname_logged)
+    {
+        if(req.url.length <= 18)
+        {
+            res.writeHead(404, {"Content-Type": "text/html"});
+            res.write("not found");
+            res.end();
+        }
+        else
+        {
+            var uname = req.url.substring(18);
+            User.find({username: uname}, function(err, user) {
+                if (err) return console.error(err);
+                if(user[0])
+                {
+                    res.render('profile.html', {});
+                }
+                else
+                {
+                    res.writeHead(404, {"Content-Type": "text/html"});
+                    res.write("not found");
+                    res.end();
+                }
+            });
+        }
+    }
+    else
+    {
+        res.render('homepage_inital.html', {});
+    }
 });
 
 // Getting json object by username
@@ -1015,7 +1070,7 @@ io.on('connection', function(client){
             }
         });
       }
-      else 
+      else
       {
           client.emit('user not find', "-1");
       }
@@ -1200,7 +1255,7 @@ io.on('connection', function(client){
             });
 
           });
-          
+
 
         }else{
           room = chats[index].room;
