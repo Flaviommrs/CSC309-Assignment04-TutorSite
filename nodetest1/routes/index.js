@@ -512,7 +512,7 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var rating_var = null;
+  var rating_var = 0;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
