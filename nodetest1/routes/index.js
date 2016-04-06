@@ -362,7 +362,7 @@ router.get('/reviewuser=*', function(req, res, next) {
         res.write("not found");
         res.end();
     }
-    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+    Review.find({reviewee: decodeURIComponent(req.url.substring(12))}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
         if(user[0])
@@ -959,12 +959,13 @@ router.get('/profile&username=*', function(req, res, next) {
         }
         else
         {
-            var uname = req.url.substring(18);
+            var uname = decodeURIComponent(req.url.substring(18));
             User.find({username: uname}, function(err, user) {
                 if (err) return console.error(err);
                 if(user[0])
                 {
-                    res.render('profile.html', {});
+                    console.log(uname);
+                    res.render('profile.html', {uname:uname});
                 }
                 else
                 {
@@ -983,13 +984,15 @@ router.get('/profile&username=*', function(req, res, next) {
 
 // Getting json object by username
 router.get('/username=*', function(req, res, next) {
+
+    console.log(req.url.substring(10));
     if(req.url.length <= 10)
     {
         res.writeHead(404, {"Content-Type": "text/html"});
         res.write("not found");
         res.end();
     }
-    User.find({username: req.url.substring(10)}, function(err, user) {
+    User.find({username: decodeURIComponent(req.url.substring(10))}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
         if(user[0])
