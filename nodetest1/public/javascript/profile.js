@@ -17,13 +17,26 @@ function sendMsg()
 
 function likeReview(id){
     var reviewer = id.substring(4);
-    var likes = parseInt((document.getElementById(reviewer+"likes").innerHTML).substring(6)) + 1;
     var request = $.ajax({
-        method: "GET",
-        url: "/reviewuser=" + uname
+        method: "POST",
+        url: "/likeReview=" + reviewer
     });
     request.done(function(msg) {
-        document.getElementById(reviewer+"likes").innerHTML = "Likes: " + likes;
+        document.getElementById(reviewer+"likes").innerHTML = "Likes: " + msg;
+    });
+    request.fail(function( jqXHR, textStatus ) {
+        alert( "Request failed: " + textStatus );
+    });
+}
+
+function dislikeReview(id){
+    var reviewer = id.substring(7);
+    var request = $.ajax({
+        method: "POST",
+        url: "/dislikeReview=" + reviewer
+    });
+    request.done(function(msg) {
+        document.getElementById(reviewer+"likes").innerHTML = "Likes: " + msg;
     });
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );

@@ -685,6 +685,54 @@ router.post('/addReview', function(req, res, next){
 
 });
 
+/* POST edit store review data. */
+router.post('/likeReview=*', function(req, res, next){
+  var username = req.url.substring(12);
+    Review.findOne({reviewer: username}, function(err, review) {
+        var likelist = review["likelist"];
+        res.writeHead(200, {"Content-Type": "text/html"});
+        if (likelist.indexOf(username)<0){
+          likelist.push(username);
+          review["likelist"] = likelist;
+          review["likes"] += 1;
+          review.save(function(err, funct) {
+            if(!err){
+                console.dir("Review Updated.");
+            } else {
+                console.dir("Failed to update Review");
+                console.dir(err);
+            }
+          });
+        }
+      res.write(review["likes"].toString());
+      res.end();
+    });
+});
+
+/* POST edit store review data. */
+router.post('/dislikeReview=*', function(req, res, next){
+  var username = req.url.substring(15);
+    Review.findOne({reviewer: username}, function(err, review) {
+        var likelist = review["likelist"];
+        res.writeHead(200, {"Content-Type": "text/html"});
+        if (likelist.indexOf(username)>=0){
+          likelist.splice(likelist.indexOf(username), 1);
+          review["likelist"] = likelist;
+          review["likes"] -= 1;
+          review.save(function(err, funct) {
+            if(!err){
+                console.dir("Review Updated.");
+            } else {
+                console.dir("Failed to update Review");
+                console.dir(err);
+            }
+          });
+        }
+      res.write(review["likes"].toString());
+      res.end();
+    });
+});
+
 /* GET review page. */
 router.get('/reviewuser=*', function(req, res, next) {
   console.log(req.url);
