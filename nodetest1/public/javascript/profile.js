@@ -75,7 +75,7 @@ function loadUser(username) {
         }
 
         document.getElementById("tutoring").innerHTML = "Tutoring: " + json["subjects"];
-        document.getElementById("rate").innerHTML = "Base Rate Per Hour: " + json["rate"];
+        document.getElementById("rate").innerHTML = "Base Rate Per Hour: $" + json["rate"];
     });
 
     request.fail(function( jqXHR, textStatus ) {

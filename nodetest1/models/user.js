@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+//Schema for the user
 var userSchema = new mongoose.Schema({
   name: { type: String, default: "" },
   email: { type: String, default: "" },
@@ -7,14 +8,14 @@ var userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   tutor: { type: Boolean, default: false },
   admin: { type: Boolean, default: false },
-  picture: String,//BinData, did not work for some reason - THIS WILL BE CHANGED! PICTURE IS NOT A STRING!
+  picture: String, //URL to the picture address
   country: { type: String, default: "" },
   city: { type: String, default: "" },
   zipcode: { type: String, default: "" },
   subjects: [String],
   events: { type: String, default: "" },
   fbID: { type: String, unique: false },
-  chats: [{room: Number, user: String}], //CHECK THIS
+  chats: [{room: Number, user: String}], //This connects the user to its chats room. The messages are on the other model
   occupation: { type: String, default: "" },
   education: { type: String, default: "" },
   experience: { type: String, default: "" },
