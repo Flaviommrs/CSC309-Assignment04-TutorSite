@@ -24,6 +24,7 @@ function loadUser(username) {
     request.done(function(msg) {
         var json = JSON.parse(msg);
         uname = json["username"];
+        document.getElementById("pp").innerHTML = json["username"]+"'s PROFILE";
         document.getElementById("name").innerHTML = "Name: " + json["name"];
         document.getElementById("occupation").innerHTML = "Occupation: " + json["occupation"];
         document.getElementById("education").innerHTML = "Education: " + json["education"];
@@ -60,7 +61,7 @@ function loadReviews(username) {
     });
     request.done(function(msg) {
         var json = JSON.parse(msg);
-        document.getElementById("reviews").innerHTML += `<p>REVIEWS</p>`
+        document.getElementById("reviews").innerHTML += `<p class="re">REVIEWS</p>`
         for (var index = 0; index< json.length; index++){
             var string = `<div class="review">
                     <div class="inline review-content">
@@ -68,6 +69,7 @@ function loadReviews(username) {
                             <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
                         </div>
                         <div class="rightreview">
+                            <p class="righttop">Likes: ` + json[index]["likes"] + `</p>
                             <p>Rating: ` + json[index]["rating"] + `/5</p>
                             <p> ` + json[index]["commented"] + `</p>
                         </div>
@@ -76,8 +78,8 @@ function loadReviews(username) {
                         <p>User: ` + json[index]["reviewer"] + `</p>
                     </div>
                     <div class="right">
-                        <button class="ratereview">Useful</button>
-                        <button class="ratereview">Not Useful</button>
+                        <button class="ratereview">Like</button>
+                        <button class="ratereview">Dislike</button>
                     </div>
                 </div>`;
             document.getElementById("reviews").innerHTML += string;
