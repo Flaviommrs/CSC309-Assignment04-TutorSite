@@ -8,11 +8,9 @@ var userSchema = new mongoose.Schema({
   tutor: { type: Boolean, default: false },
   admin: { type: Boolean, default: false },
   picture: String,//BinData, did not work for some reason - THIS WILL BE CHANGED! PICTURE IS NOT A STRING!
-  //location: {
-      country: { type: String, default: "" },
-      city: { type: String, default: "" },
-      zipcode: { type: String, default: "" },
-  //},
+  country: { type: String, default: "" },
+  city: { type: String, default: "" },
+  zipcode: { type: String, default: "" },
   subjects: [String],
   events: { type: String, default: "" },
   fbID: { type: String, unique: false },
