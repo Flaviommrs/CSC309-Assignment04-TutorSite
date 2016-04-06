@@ -15,6 +15,21 @@ function sendMsg()
     }
 }
 
+function likeReview(id){
+    var reviewer = id.substring(4);
+    var likes = parseInt((document.getElementById(reviewer+"likes").innerHTML).substring(6)) + 1;
+    var request = $.ajax({
+        method: "GET",
+        url: "/reviewuser=" + uname
+    });
+    request.done(function(msg) {
+        document.getElementById(reviewer+"likes").innerHTML = "Likes: " + likes;
+    });
+    request.fail(function( jqXHR, textStatus ) {
+        alert( "Request failed: " + textStatus );
+    });
+}
+
 function loadUser(username) {
     var request = $.ajax({
         method: "GET",
@@ -69,7 +84,7 @@ function loadReviews(username) {
                             <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
                         </div>
                         <div class="rightreview">
-                            <p class="righttop">Likes: ` + json[index]["likes"] + `</p>
+                            <p class="righttop" id="`+json[index]["reviewer"]+`likes">Likes: ` + json[index]["likes"] + `</p>
                             <p>Rating: ` + json[index]["rating"] + `/5</p>
                             <p> ` + json[index]["commented"] + `</p>
                         </div>
@@ -78,8 +93,8 @@ function loadReviews(username) {
                         <p>User: ` + json[index]["reviewer"] + `</p>
                     </div>
                     <div class="right">
-                        <button class="ratereview">Like</button>
-                        <button class="ratereview">Dislike</button>
+                        <button class="ratereview" id="like`+json[index]["reviewer"]+`" onclick="likeReview(this.id)">Like</button>
+                        <button class="ratereview" id="dislike`+json[index]["reviewer"]+`" onclick="dislikeReview(this.id)">Dislike</button>
                     </div>
                 </div>`;
             document.getElementById("reviews").innerHTML += string;
