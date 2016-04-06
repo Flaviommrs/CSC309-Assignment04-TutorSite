@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/styleWeekView.css"> <!-- CHANGE TO ADMIN IF NEEDED -->
     <title>Tutor Me - Admin page</title>
     <link rel="icon" href="/images/favicon.png"> <!-- favicon not yet made -->
+    <script src="/javascript/socket.io/socket.io.js"></script>
 
     <script>
 
@@ -94,27 +95,32 @@
                         }
     				}
                     var updateButton = document.createElement('BUTTON');
-                    updateButton.innerHTML = "DELETE";
-                    updateButton.id = 'BTNDELETE';
+                    updateButton.innerHTML = "UPDATE";
+                    updateButton.id = 'BTNUPDATE';
                     updateButton.onclick = function()
     				{
-                        //TODO
-                        /* REFERENCE ONLY
-                        if(pageType == USERPAGE)
-                        {
-                            var selectE = document.getElementById("DBinfo");
-                            var selectedE = selectE.options[selectE.selectedIndex];
-                            window.location.href = '/admin/delete&username=' + selectedE.value;
-                        }
-                        else if(pageType == CHATPAGE)
-                        {
-                            var selectE = document.getElementById("DBinfo");
-                            var selectedE = selectE.options[selectE.selectedIndex];
-                            window.location.href = '/admin/delete&roomname=' + selectedE.value;
-                        }
-                        */
+                        var socket = io.connect('http://localhost:4200');
+                        socket.on('connect', function(data) {
+                            var elemInfo = document.getElementById('elemInfo');
+                            var myJSONObj = JSON.parse(elemInfo.value);
+                            if(pageType == USERPAGE)
+                            {
+                                socket.emit('updateDBEntryUser', JSON.stringify(myJSONObj));
+                            }
+                            else if(pageType == CHATPAGE)
+                            {
+                                socket.emit('updateDBEntryChat', JSON.stringify(myJSONObj));
+                            }
+                            socket.on('failedDB', function(data) {
+                                alert("Some unexpected problem happened on saving your data. Please try again.");
+                            });
+                            socket.on('success', function(data) {
+                                alert("Data updated.");
+                            });
+                        });
     				}
                     div.appendChild(deleteButton);
+                    div.appendChild(updateButton);
 
                 }
 

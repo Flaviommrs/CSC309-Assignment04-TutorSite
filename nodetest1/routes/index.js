@@ -617,7 +617,7 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}), 
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}),
     price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
 });
 
@@ -743,6 +743,38 @@ function checkNewUserData(data)
 
 io.on('connection', function(client){
   console.log('a user connected');
+
+  client.on('updateDBEntryUser', function(data) {
+        data = JSON.parse(data);
+
+        //TODO CHECK FOR VALID USER MAKING MODIFICATIONS - NO SECURITY HERE FOR NOW
+
+        User.findOne({_id: data["_id"]}, function(err, user) {
+
+          if (user)
+          {
+                for(var propertyName in data) {
+                   user[propertyName] = data[propertyName];
+                }
+                console.dir(user);
+                user.save(function(err, funct) {
+                    if(!err){
+                        console.dir("User Updated.");
+                        client.emit('success', "0");
+                    } else {
+                        console.dir("Failed to update user");
+                        console.dir(err);
+                        client.emit('failedDB', "-1");
+                    }
+                });
+          }
+          else
+          {
+              console.dir("User not found.");
+              client.emit('failedDB', "-1");
+          }
+        });
+    });
 
   client.on('updateEvs', function(data) {
         data = JSON.parse(data);
