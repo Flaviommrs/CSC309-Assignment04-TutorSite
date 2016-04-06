@@ -523,8 +523,8 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}), 
-    price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
+    price: resultPrice, subject: resultSubject});
 });
 
 /* GET weekview page. */
