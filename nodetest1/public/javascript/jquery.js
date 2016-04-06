@@ -34,7 +34,7 @@ function loadUser(username) {
         document.getElementById("email").innerHTML = "Email: " + json["email"];
         if(json["location"])
         {
-            document.getElementById("location").innerHTML = "Location: " + json["location"]["city"] + ", " + json["location"]["country"];
+            document.getElementById("location").innerHTML = "Location: " + json/*["location"]*/["city"] + ", " + json/*["location"]*/["country"];
         }
         else
         {

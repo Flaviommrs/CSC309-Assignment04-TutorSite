@@ -374,7 +374,7 @@ router.get('/signup', function(req, res, next) {
 
 //POST for edit profile
 router.post('/editingProfile', function(req, res, next){
-  console.dir(req.body.number);
+  console.dir(req.body.math);
 
   if (req.body.name != '') {
     console.dir("in if");
@@ -428,6 +428,63 @@ router.post('/editingProfile', function(req, res, next){
   if (req.body.about != '') {
     console.dir("in if");
     User.update({username:currentUser}, {$set:{about:req.body.about}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.city != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{city:req.body.city}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.country != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{country:req.body.country}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  var subject_update = []
+if (req.body.none == undefined){
+  if (req.body.math != undefined) {
+    subject_update.push(req.body.math);
+  }
+
+  if (req.body.biology != undefined) {
+    subject_update.push(req.body.biology);
+  }
+
+  if (req.body.chemistry != undefined) {
+    subject_update.push(req.body.chemistry);
+  }
+
+  if (req.body.physics != undefined) {
+    subject_update.push(req.body.physics);
+  }
+
+  if (req.body.geography != undefined) {
+    subject_update.push(req.body.geography);
+  }
+
+  if (req.body.english != undefined) {
+    subject_update.push(req.body.english);
+  }
+
+  if (req.body.hist != undefined) {
+    subject_update.push(req.body.hist);
+  }
+}
+
+  if (subject_update.length > 0) {
+    User.update({username:currentUser}, {$set:{subjects:subject_update}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.none != undefined) {
+    User.update({username:currentUser}, {$set:{subjects:[]}}, function(err, result) {
       console.dir("update");
     });
   }
