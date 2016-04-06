@@ -132,8 +132,9 @@ router.post('/facebookSignUp',function (req, res, next){
 router.get('/fbsignup&username=*', function (req, res, next){
 
 
-  var username = req.url.substring(19);
+  var username = decodeURIComponent(req.url.substring(19));
   console.log(username);
+
 
   res.render('fbsignup.html', {username: username});
 
@@ -1059,44 +1060,56 @@ io.on('connection', function(client){
 
         if(index < 0){
 
-          Chat.count(function(err, c){
+          Chat.count({},function(err, c){
 
             room = c;
+            var messages = [];
+
+            //creates a new room for the conversation
+            var chatRoom = new Chat({roomName: room, messages:messages});
+            chatRoom.save(function(err, funct) {
+              console.dir("New room Saved.");
+            });
+
+            var userChats = chats.slice(0);
+            var chatUser = {room:room, user: data.receiver};
+
+            userChats.push(chatUser);
+
+            user.chats = userChats;
+
+            user.save();
+
+            User.findOne({username: data.receiver}, function(err, receiver){
+
+              var reChats = receiver.chats.slice(0);
+
+              var chatReceiver = {room:room, user: data.user};
+
+              reChats.push(chatReceiver);
+
+              receiver.chats = reChats;
+
+              receiver.save();
+
+            });
+
+            console.log(data.user, ' logging into room ', room);
+            client.join(room);
+
+            Chat.findOne({roomName: room}, function(err, chatRoom){
+
+              if(chatRoom){
+
+                var log = {room: room, log:chatRoom.messages};
+
+                client.emit('message log', log);
+              }
+
+            });
 
           });
-          var messages = [];
-
-          //creates a new room for the conversation
-          var chatRoom = new Chat({roomName: room, messages:messages});
-          chatRoom.save(function(err, funct) {
-            console.dir("New room Saved.");
-          });
-
-          var userChats = chats.slice(0);
-          var chatUser = {room:room, user: data.receiver};
-
-          userChats.push(chatUser);
-
-          user.chats = userChats;
-
-          user.save();
-
-          User.findOne({username: data.receiver}, function(err, receiver){
-
-            var reChats = receiver.chats.slice(0);
-
-            var chatReceiver = {room:room, user: data.user};
-
-            reChats.push(chatReceiver);
-
-            receiver.chats = reChats;
-
-            receiver.save();
-
-          });
-
-          console.log(data.user, ' logging into room ', room);
-          client.join(room);
+          
 
         }else{
           room = chats[index].room;
@@ -1104,18 +1117,18 @@ io.on('connection', function(client){
           console.log(data.user, ' logging into room ', room);
           client.join(room);
 
+          Chat.findOne({roomName: room}, function(err, chatRoom){
+
+            if(chatRoom){
+
+              var log = {room: room, log:chatRoom.messages};
+
+              client.emit('message log', log);
+            }
+
+          });
+
         }
-
-        Chat.findOne({roomName: room}, function(err, chatRoom){
-
-          if(chatRoom){
-
-            var log = {room: room, log:chatRoom.messages};
-
-            client.emit('message log', log);
-          }
-
-        });
 
       }
     });
