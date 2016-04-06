@@ -534,6 +534,10 @@ router.get('/links', function(req, res, next) {
     res.render('links.html', {});
 });
 
+router.get('/review', function(req, res, next) {
+    res.render('review.html', {});
+});
+
 /* GET message page. */
 router.get('/message', function(req, res, next) {
     var secret = 'tutorMeSecretString';
