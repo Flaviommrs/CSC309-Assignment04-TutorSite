@@ -470,13 +470,13 @@ if (req.body.none == undefined){
 }
 
   if (subject_update.length > 0) {
-    User.update({username:result}, {$set:{subjects:subject_update}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:subject_update, tutor: true}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.none != undefined) {
-    User.update({username:result}, {$set:{subjects:[]}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:[], tutor :false}}, function(err, result) {
       console.dir("update");
     });
   }
@@ -762,26 +762,26 @@ router.post('/searchFind', function(req, res, next){
   //console.dir(searchedTerm);
 
   /* Find username */
-  User.findOne({username: searchedTerm}, function(err, user) {
+  User.findOne({username: searchedTerm, tutor: true}, function(err, user) {
     resultUsername = user;
     //console.dir(resultUsername);
     return;
   });
 
 
-  User.find({name: searchedTerm}, function(err, name) {
+  User.find({name: searchedTerm, tutor: true}, function(err, name) {
     resultNames = name;
     //console.dir(resultNames);
     return;
   });
 
-  User.find({rate: searchedTerm}, function(err, price) {
+  User.find({rate: searchedTerm, tutor: true}, function(err, price) {
     resultPrice = price;
     //console.dir(resultPrice);
     return;
   });
 
-  User.find({subjects: { $in: [searchedTerm] }}, function(err, subject) {
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
     resultSubject = subject;
     //console.dir(resultSubject);
     return;
@@ -800,7 +800,7 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country}, function(err, location) {
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
         sameLocation = location;
       });
     });
@@ -811,14 +811,32 @@ router.post('/searchFind', function(req, res, next){
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+   User.find({subjects: { $in: [req.body.subject] }, tutor: true}, function(err, subject) {
      resultSubject = subject;
      searchedTerm = req.body.subject;
      //console.dir(resultSubject);
      return;
    });
 
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    //Find current user location
+    User.find({username: result}, function(err, user) {
+      console.dir(user[0].city);
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
+        sameLocation = location;
+      });
+    });
+
    res.redirect('/search');
+ }
  });
 
 /* GET search page. */
