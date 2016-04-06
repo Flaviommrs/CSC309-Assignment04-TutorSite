@@ -42,28 +42,36 @@ function facebookSignUp(){
 }
 
 function facebookLogIn(){
+
+	FB.getLoginStatus(function(response){
+
+		if(response.status == "connected"){
 	
-	FB.login(function(response){
+			FB.login(function(response){
 
-		if (response.authResponse) {
+				if (response.authResponse) {
 
-			if(response.status == "connected"){
-				console.log(response);
+					
+						console.log(response);
 
-			    FB.api('/me', function(data) {
-			    	console.log(data);
-			    	logForm(data);
-			    });
-			}
+					    FB.api('/me', function(data) {
+					    	console.log(data);
+					    	logForm(data);
+					    });
+					
 
-	    } else {
-	    	console.log('User cancelled login or did not fully authorize.');
-	    }
+			    } else {
+			    	console.log('User cancelled login or did not fully authorize.');
+			    }
 
-	},{
-		scope:'public_profile',
-		retun_scopes:true
-	});
+			},{
+				scope:'public_profile',
+				retun_scopes:true
+			});
+
+		}
+
+}	);
 
 }
 

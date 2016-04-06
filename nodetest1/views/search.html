@@ -20,8 +20,8 @@
 		    </form>
 		</div>
 
-<h3> Recommended Tutors </h3>
 <% if (location && location.length >0) { %>
+<h3> Recommended Tutors </h3>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < location.length; i++){ %>
 		<a href="/profile&username=<%= location[i].username %>">

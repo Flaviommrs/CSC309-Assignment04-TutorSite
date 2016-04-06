@@ -11,7 +11,7 @@
     <script src='javascript/fullcalendar/fullcalendar.js'></script>
     <script src='javascript/fullcalendar/fullcalendar.min.js'></script>
     <script src='javascript/lib/jquery-ui.custom.min.js'></script>
-    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/styleCAL.css">
     <title>Tutor Me - Registration Page</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
@@ -182,11 +182,7 @@
             myJSONObj.subjects = subjects;
             myJSONObj.username = <%- JSON.stringify(username) %>;
 
-            myJSONObj.username = myJSONObj.username.replace("%20", " ")
-
             /** PARSING OF THE EVENTS **/
-
-            alert(myJSONObj);
             
             socket.emit('fb', JSON.stringify(myJSONObj));
 
@@ -202,11 +198,11 @@
     <a href="/"><img  id="logo" src="images/logo.png" alt="Logo"></a></div>
 <div class="header_text">
     <h1>
-        Welcome to Tutor Me!
+        Just One More Step....
     </h1>
 </div>
 <div class="content">
-    <h1> Sign up to TutorMe </h1>
+    <h1> ...Just a Simple Question!!! </h1>
 
     <form id="register">
         <fieldset>

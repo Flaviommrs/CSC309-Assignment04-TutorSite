@@ -21,12 +21,12 @@ var currentUser = null;
 //LOGOUT PAGE
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
-    res.clearCookie('MyCookie');
     res.redirect('/');
 });
 
 /* Test from html file input to server to database */
 router.post('/usernameTest', function(req, res, next){
+
   console.dir(req.body.uname);
   console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
@@ -132,8 +132,9 @@ router.post('/facebookSignUp',function (req, res, next){
 router.get('/fbsignup&username=*', function (req, res, next){
 
 
-  var username = req.url.substring(19);
+  var username = decodeURIComponent(req.url.substring(19));
   console.log(username);
+
 
   res.render('fbsignup.html', {username: username});
 
@@ -492,13 +493,13 @@ if (req.body.none == undefined){
 }
 
   if (subject_update.length > 0) {
-    User.update({username:result}, {$set:{subjects:subject_update}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:subject_update, tutor: true}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.none != undefined) {
-    User.update({username:result}, {$set:{subjects:[]}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:[], tutor :false}}, function(err, result) {
       console.dir("update");
     });
   }
@@ -786,26 +787,22 @@ router.post('/searchFind', function(req, res, next){
   //console.dir(searchedTerm);
 
   /* Find username */
-  User.findOne({username: searchedTerm}, function(err, user) {
+  User.findOne({username: searchedTerm, tutor: true}, function(err, user) {
     resultUsername = user;
     //console.dir(resultUsername);
     return;
   });
 
 
-  User.find({name: searchedTerm}, function(err, name) {
+  User.find({name: searchedTerm, tutor: true}, function(err, name) {
     resultNames = name;
     //console.dir(resultNames);
     return;
   });
 
-  User.find({rate: searchedTerm}, function(err, price) {
-    resultPrice = price;
-    //console.dir(resultPrice);
-    return;
-  });
+  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
 
-  User.find({subjects: { $in: [searchedTerm] }}, function(err, subject) {
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
     resultSubject = subject;
     //console.dir(resultSubject);
     return;
@@ -824,7 +821,7 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country}, function(err, location) {
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
         sameLocation = location;
       });
     });
@@ -835,14 +832,32 @@ router.post('/searchFind', function(req, res, next){
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+   User.find({subjects: { $in: [req.body.subject] }, tutor: true}, function(err, subject) {
      resultSubject = subject;
      searchedTerm = req.body.subject;
      //console.dir(resultSubject);
      return;
    });
 
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    //Find current user location
+    User.find({username: result}, function(err, user) {
+      console.dir(user[0].city);
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
+        sameLocation = location;
+      });
+    });
+
    res.redirect('/search');
+ }
  });
 
 /* GET search page. */
@@ -1020,7 +1035,7 @@ io.on('connection', function(client){
             }
         });
       }
-      else 
+      else
       {
           client.emit('user not find', "-1");
       }
@@ -1156,44 +1171,56 @@ io.on('connection', function(client){
 
         if(index < 0){
 
-          Chat.count(function(err, c){
+          Chat.count({},function(err, c){
 
             room = c;
+            var messages = [];
+
+            //creates a new room for the conversation
+            var chatRoom = new Chat({roomName: room, messages:messages});
+            chatRoom.save(function(err, funct) {
+              console.dir("New room Saved.");
+            });
+
+            var userChats = chats.slice(0);
+            var chatUser = {room:room, user: data.receiver};
+
+            userChats.push(chatUser);
+
+            user.chats = userChats;
+
+            user.save();
+
+            User.findOne({username: data.receiver}, function(err, receiver){
+
+              var reChats = receiver.chats.slice(0);
+
+              var chatReceiver = {room:room, user: data.user};
+
+              reChats.push(chatReceiver);
+
+              receiver.chats = reChats;
+
+              receiver.save();
+
+            });
+
+            console.log(data.user, ' logging into room ', room);
+            client.join(room);
+
+            Chat.findOne({roomName: room}, function(err, chatRoom){
+
+              if(chatRoom){
+
+                var log = {room: room, log:chatRoom.messages};
+
+                client.emit('message log', log);
+              }
+
+            });
 
           });
-          var messages = [];
-
-          //creates a new room for the conversation
-          var chatRoom = new Chat({roomName: room, messages:messages});
-          chatRoom.save(function(err, funct) {
-            console.dir("New room Saved.");
-          });
-
-          var userChats = chats.slice(0);
-          var chatUser = {room:room, user: data.receiver};
-
-          userChats.push(chatUser);
-
-          user.chats = userChats;
-
-          user.save();
-
-          User.findOne({username: data.receiver}, function(err, receiver){
-
-            var reChats = receiver.chats.slice(0);
-
-            var chatReceiver = {room:room, user: data.user};
-
-            reChats.push(chatReceiver);
-
-            receiver.chats = reChats;
-
-            receiver.save();
-
-          });
-
-          console.log(data.user, ' logging into room ', room);
-          client.join(room);
+          
 
         }else{
           room = chats[index].room;
@@ -1201,18 +1228,18 @@ io.on('connection', function(client){
           console.log(data.user, ' logging into room ', room);
           client.join(room);
 
+          Chat.findOne({roomName: room}, function(err, chatRoom){
+
+            if(chatRoom){
+
+              var log = {room: room, log:chatRoom.messages};
+
+              client.emit('message log', log);
+            }
+
+          });
+
         }
-
-        Chat.findOne({roomName: room}, function(err, chatRoom){
-
-          if(chatRoom){
-
-            var log = {room: room, log:chatRoom.messages};
-
-            client.emit('message log', log);
-          }
-
-        });
 
       }
     });
