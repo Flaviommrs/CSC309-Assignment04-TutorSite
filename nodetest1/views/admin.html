@@ -12,12 +12,14 @@
     <script src="/javascript/socket.io/socket.io.js"></script>
 
     <script>
-
+        /*SCRIPT TO DINAMICALLY LOAD THE PAGE ACCORDING TO THE USER PRIVILEGES*/
         var USERPAGE = 1;
         var CHATPAGE = 2;
         var pageType = 0;
 
 
+        //Function to display the data of a row of the DB when a certain
+        //element is chosen on the dropdown menu
         function updateSelection()
         {
             var selectE = document.getElementById("DBinfo");
@@ -27,6 +29,7 @@
         }
 
         $(document).ready(function() {
+            //If the user has no authorization to access the page, it is redirected to another page.
             if(<%-result %> == false)
             {
                 alert("Sorry, but you don't have access to the admin page. Please login with an admin account.");
@@ -35,6 +38,9 @@
             else
             {
                 //ADMIN HAS ACCESS TO ALL THE FEATURES OF THE PAGE
+                //NOTE: This is not a security flaw because even if the user
+                //has some way of getting around this verification, he won't be
+                //able to receive the information through the info variable.
                 var div = document.getElementById('sensitiveInfo');
                 var usersButton = document.createElement('BUTTON');
                 usersButton.innerHTML = "USERS";
@@ -124,7 +130,7 @@
 
                 }
 
-
+                //Function called to load the row information in the beggining
                 updateSelection();
             }
 

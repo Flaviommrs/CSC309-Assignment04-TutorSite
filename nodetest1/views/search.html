@@ -7,10 +7,18 @@
 	    <link rel="icon" href="images/favicon.png"> 
 	  </head>
 
-	<!-- Header bar -->
+	<!-- Refresh once for database lag -->
+	 <script type="text/javascript">
+	window.onload = function() {
+    if(!window.location.hash) {
+        window.location = window.location + '#refresh';
+        window.location.reload();
+    }
+}
+    </script> 
 
 	<body>
-
+	<!-- Header bar -->
 		<div class="header">
 			<a href="/"><img  id="logo" src="images/logo.png" alt="Logo"></a>		</div>
 		<div class="search_container">
@@ -24,15 +32,17 @@
 <h3> Recommended Tutors </h3>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < location.length; i++){ %>
-		<a href="/profile&username=<%= location[i].username %>">
-		<li>
-			<img src="images/pri_001.jpg" />
-			<h3><%= location[i].username %></h3>
-			<p>Name: <%=location[i].name %></p>
-			<p>Location: <%=location[i].city %> , <%=location[i].country %></p>
-			<p>Tutoring: <%=location[i].subjects %></p>
-		</li>
-		</a>
+			<% if (i < 5 ) { %>
+				<a href="/profile&username=<%= location[i].username %>">
+				<li>
+					<img src="images/pri_001.jpg" />
+					<h3><%= location[i].username %></h3>
+					<p>Name: <%=location[i].name %></p>
+					<p>Location: <%=location[i].city %> , <%=location[i].country %></p>
+					<p>Tutoring: <%=location[i].subjects %></p>
+				</li>
+				</a>
+			<% } %>
 		<% } %>
 	</ul>
 <% } %>
