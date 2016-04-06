@@ -16,7 +16,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
-var currentUser = null;
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -84,7 +83,6 @@ router.post('/LoginAuthentication', function(req, res, next){
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
-        currentUser = log_username;
         //SAVE THE COOKIE
         //var userData = {username: user.username};
         //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
@@ -366,138 +364,16 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
 });
 
 
+
+
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
     res.render('signup.html', {});
 });
 
-
-//POST for edit profile
-router.post('/editingProfile', function(req, res, next){
-  console.dir(req.body.math);
-
-  if (req.body.name != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{name:req.body.name}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.number != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{phone:req.body.number}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.email != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{email:req.body.email}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.rate != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{rate:req.body.rate}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.occupation != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{occupation:req.body.occupation}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.education != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{education:req.body.education}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.experience != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{experience:req.body.experience}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.about != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{about:req.body.about}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.city != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{city:req.body.city}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.country != '') {
-    console.dir("in if");
-    User.update({username:currentUser}, {$set:{country:req.body.country}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  var subject_update = []
-if (req.body.none == undefined){
-  if (req.body.math != undefined) {
-    subject_update.push(req.body.math);
-  }
-
-  if (req.body.biology != undefined) {
-    subject_update.push(req.body.biology);
-  }
-
-  if (req.body.chemistry != undefined) {
-    subject_update.push(req.body.chemistry);
-  }
-
-  if (req.body.physics != undefined) {
-    subject_update.push(req.body.physics);
-  }
-
-  if (req.body.geography != undefined) {
-    subject_update.push(req.body.geography);
-  }
-
-  if (req.body.english != undefined) {
-    subject_update.push(req.body.english);
-  }
-
-  if (req.body.hist != undefined) {
-    subject_update.push(req.body.hist);
-  }
-}
-
-  if (subject_update.length > 0) {
-    User.update({username:currentUser}, {$set:{subjects:subject_update}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  if (req.body.none != undefined) {
-    User.update({username:currentUser}, {$set:{subjects:[]}}, function(err, result) {
-      console.dir("update");
-    });
-  }
-
-  res.redirect("/profile&username=" + currentUser);
-
-});
-
 /* GET edit profile page. */
 router.get('/editProfile', function(req, res, next) {
-  User.findOne({username: currentUser}, function(err, user) {
-    res.render('editprofile.html', {userinfo: user});
-  });
+    res.render('editprofile.html', {});
 });
 
 /* GET fb login page. Test*/
@@ -515,7 +391,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {current: currentUser});
+        res.render('homepage_user.html', {});
     }
     else
     {
@@ -532,10 +408,6 @@ router.get('/inbox', function(req, res, next) {
 /* GET links page. */
 router.get('/links', function(req, res, next) {
     res.render('links.html', {});
-});
-
-router.get('/review', function(req, res, next) {
-    res.render('review.html', {});
 });
 
 /* GET message page. */
@@ -556,6 +428,12 @@ router.get('/message', function(req, res, next) {
                 var chats = user.chats;
                 var allTalks = {};
                 var listOfTalks = [];
+
+                if(chats.length == 0)
+                {
+                    res.render('inbox.html', {userNameReceived: result, allTalks: null});
+                }
+
                 for(var i = 0; i < chats.length; i++)
                 {
                     var found = 0;
@@ -564,7 +442,11 @@ router.get('/message', function(req, res, next) {
                         found++;
                         if(chatFound[0])
                         {
-                            var lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            var lastMsg = "";
+                            if(chatFound[0].messages.length != 0)
+                            {
+                                lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            }
                             var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
                             var talk = {name: userTalkingTo, message: lastMsg, read: read};
                             listOfTalks.push(talk);
@@ -638,7 +520,7 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var rating_var = 0;
+  var rating_var = null;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
@@ -663,55 +545,33 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: currentUser,
+  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
       console.dir("New comment.");
-
-      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, result) {
-      });
-
-      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, result) {
-      });
-
       res.redirect("/profile&username=" + req.body.tutName);
     } else {
         console.dir("Failed to save comment ");
         console.dir(err);
     }
   });
-
 });
 
 /* GET review page. */
-router.get('/reviewuser=*', function(req, res, next) {
-  console.log(req.url);
-    if(req.url.length <= 12)
-    {
-        res.writeHead(404, {"Content-Type": "text/html"});
-        res.write("not found");
-        res.end();
-    }
-    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
-        if (err) return console.error(err);
-        console.dir("Retrived file from db.");
-        if(user[0])
-        {
-            res.writeHead(200, {"Content-Type": "text/html"});
-            res.write(JSON.stringify(user));
-        }
-        else
-        {
-            res.writeHead(200, {"Content-Type": "text/html"});
-            res.write("not found");
-        }
-        res.end();
-    });
+router.get('/review', function(req, res, next) {
+    res.render('review.html', {});
 });
 
 /*
+Search cases:
+user looks for username
+user looks for name
+user looks for area
+user look for price
+user looks subject
+
 recommmendation system based on rating
 */
 
@@ -759,18 +619,6 @@ router.post('/searchFind', function(req, res, next){
 
 });
 
-//Subject Searchs
-router.post('/searchSubject', function(req, res, next){
-  User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
-    resultSubject = subject;
-    searchedTerm = req.body.subject;
-    //console.dir(resultSubject);
-    return;
-  });
-
-  res.redirect('/search');
-});
-
 /* GET search page. */
 router.get('/search', function(req, res, next) {
   console.dir(searchedTerm);
@@ -779,8 +627,8 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
-    price: resultPrice, subject: resultSubject});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}),
+    price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
 });
 
 /* GET weekview page. */
