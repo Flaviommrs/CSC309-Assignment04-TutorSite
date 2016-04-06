@@ -61,19 +61,19 @@ function loadReviews(username) {
     request.done(function(msg) {
         var json = JSON.parse(msg);
         document.getElementById("reviews").innerHTML += `<p>REVIEWS</p>`
-        for (review in json){
+        for (var index = 0; index< json.length; index++){
             var string = `<div class="review">
                     <div class="inline review-content">
                         <div class="leftreview">
                             <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
                         </div>
                         <div class="rightreview">
-                            <p>Rating: ` + json["rating"] + `</p>
-                            <p> ` + json["commented"] + `</p>
+                            <p>Rating: ` + json[index]["rating"] + `/5</p>
+                            <p> ` + json[index]["commented"] + `</p>
                         </div>
                     </div>
                     <div>
-                        <p> ` + json["reviewer"] + `</p>
+                        <p>User: ` + json[index]["reviewer"] + `</p>
                     </div>
                     <div class="right">
                         <button class="ratereview">Useful</button>
