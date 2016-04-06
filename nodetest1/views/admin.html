@@ -12,6 +12,10 @@
 
     <script>
 
+        var USERPAGE = 1;
+        var CHATPAGE = 2;
+        var pageType = 0;
+
 
         function updateSelection()
         {
@@ -36,7 +40,6 @@
                 usersButton.id = 'BTNUSERS';
                 usersButton.onclick = function()
 				{
-                    //TODO
 					window.location.href = '/admin/users';
 				}
                 var chatsButton = document.createElement('BUTTON');
@@ -44,7 +47,6 @@
                 chatsButton.id = 'BTNCHATS';
                 chatsButton.onclick = function()
 				{
-					//TODO
                     window.location.href = '/admin/chat';
 				}
                 div.appendChild(usersButton);
@@ -62,14 +64,58 @@
                         if(info[i].username == undefined)
                         {
                             newOption.innerHTML = info[i].roomName;
+                            pageType = CHATPAGE;
                         }
                         else
                         {
                             newOption.innerHTML = info[i].username;
+                            pageType = USERPAGE;
                         }
 
                         div.appendChild(newOption);
                     }
+                    div = document.getElementById('modifyDB');
+                    var deleteButton = document.createElement('BUTTON');
+                    deleteButton.innerHTML = "DELETE";
+                    deleteButton.id = 'BTNDELETE';
+                    deleteButton.onclick = function()
+    				{
+                        if(pageType == USERPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&username=' + selectedE.value;
+                        }
+                        else if(pageType == CHATPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&roomname=' + selectedE.value;
+                        }
+    				}
+                    var updateButton = document.createElement('BUTTON');
+                    updateButton.innerHTML = "DELETE";
+                    updateButton.id = 'BTNDELETE';
+                    updateButton.onclick = function()
+    				{
+                        //TODO
+                        /* REFERENCE ONLY
+                        if(pageType == USERPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&username=' + selectedE.value;
+                        }
+                        else if(pageType == CHATPAGE)
+                        {
+                            var selectE = document.getElementById("DBinfo");
+                            var selectedE = selectE.options[selectE.selectedIndex];
+                            window.location.href = '/admin/delete&roomname=' + selectedE.value;
+                        }
+                        */
+    				}
+                    div.appendChild(deleteButton);
+
                 }
 
 
@@ -97,10 +143,14 @@
 <select onChange='updateSelection()' id ="DBinfo">
 
 </select>
+<br/>
+<br/>
+<textarea rows=10 cols=100 id='elemInfo'></textarea>
+<br/>
+<br/>
+<div id="modifyDB">
 
-<span id='elemInfo'>
-
-</span>
+</div>
 
 </div>
 

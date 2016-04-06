@@ -271,6 +271,100 @@ router.get('/admin/chat', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
+/*DELETE USER FROM DB*/
+router.get('/admin/delete&username=*', function(req, res, next) {
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/users');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  var userToDelete = req.url.substring(23);
+                  User.remove({ username: userToDelete }, function(err) {
+                    res.redirect('/admin/users');
+                  });
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+/*DELETE CHATROOM FROM DB*/
+router.get('/admin/delete&roomname=*', function(req, res, next) {
+    console.log("Right where I should be");
+    if(req.url <= 23)
+    {
+        res.redirect('/admin/chat');
+    }
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+        User.findOne({username: result}, function(err, user) {
+
+          if (user)
+          {
+              if(user.admin)
+              {
+                  try
+                  {
+                        var chatToDelete = parseInt(req.url.substring(23));
+                        Chat.remove({ roomName: chatToDelete }, function(err) {
+                          res.redirect('/admin/chat');
+                        });
+                  } catch (e)
+                  {
+                      res.redirect('/admin/chat');
+                  }
+              }
+              else
+              {
+                  res.render('admin.html', {result: false, info: null});
+              }
+
+          }
+          else
+          {
+              res.render('admin.html', {result: false, info: null});
+          }
+        });
+    }
+    else
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+});
+
+
+
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
