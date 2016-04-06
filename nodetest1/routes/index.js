@@ -125,12 +125,12 @@ router.post('/facebookSignUp',function (req, res, next){
 
   res.redirect('/fbsignup&username=' + username);
 });
-router.get('/fbsignup&username=*', function (req, res, next){
 
+/*code resposible for redirecting the user to the next step in the sign up using facebook*/
+router.get('/fbsignup&username=*', function (req, res, next){
 
   var username = decodeURIComponent(req.url.substring(19));
   console.log(username);
-
 
   res.render('fbsignup.html', {username: username});
 
@@ -362,7 +362,7 @@ router.get('/reviewuser=*', function(req, res, next) {
         res.write("not found");
         res.end();
     }
-    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+    Review.find({reviewee: decodeURIComponent(req.url.substring(12))}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
         if(user[0])
@@ -522,11 +522,6 @@ router.get('/editProfile', function(req, res, next) {
         res.render('editprofile.html', {userinfo: user});
       });
     }
-});
-
-/* GET fb login page. Test*/
-router.get('/facebookLog', function(req, res, next) {
-    res.render('facebookLog.html', {});
 });
 
 /* GET user homepage page. */
@@ -709,9 +704,14 @@ router.post('/addReview', function(req, res, next){
     rating_var = 5;
   };
 
+  var pic = "";
+  User.find({username: result}, function(err, user) {
+    if (err) return console.error(err);
+    pic = user["picture"];
+  });
 
   var comment = new Review({reviewee: req.body.tutName, reviewer: result,
-  rating: rating_var, commented: req.body.comment});
+  rating: rating_var, commented: req.body.comment, picture: pic});
 
   comment.save(function(err, funct) {
     if(!err){
@@ -885,6 +885,30 @@ router.get('/search', function(req, res, next) {
     price: resultPrice, subject: resultSubject, location: sameLocation});
 });
 
+/* POST add picture page. */
+router.post('/addingPicture', function(req, res, next) {
+
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    User.update({username:result}, {$set:{picture:req.body.profPic}}, function(err, result) {
+      console.dir(req.body.profPic);
+    });
+    res.redirect("/profile&username=" + result);
+  }
+});
+
+/* GET add picture page. */
+router.get('/addPicture', function(req, res, next) {
+  res.render('add_pic.html', {});
+});
+
 /* GET weekview page. - gets the schedule of the user that is logged in */
 router.get('/weekView', function(req, res, next) {
     var secret = 'tutorMeSecretString';
@@ -964,12 +988,13 @@ router.get('/profile&username=*', function(req, res, next) {
         }
         else
         {
-            var uname = req.url.substring(18);
+            var uname = decodeURIComponent(req.url.substring(18));
             User.find({username: uname}, function(err, user) {
                 if (err) return console.error(err);
                 if(user[0])
                 {
-                    res.render('profile.html', {});
+                    console.log(uname);
+                    res.render('profile.html', {uname:uname});
                 }
                 else
                 {
@@ -988,13 +1013,15 @@ router.get('/profile&username=*', function(req, res, next) {
 
 // Getting json object by username
 router.get('/username=*', function(req, res, next) {
+
+    console.log(req.url.substring(10));
     if(req.url.length <= 10)
     {
         res.writeHead(404, {"Content-Type": "text/html"});
         res.write("not found");
         res.end();
     }
-    User.find({username: req.url.substring(10)}, function(err, user) {
+    User.find({username: decodeURIComponent(req.url.substring(10))}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
         if(user[0])
@@ -1041,24 +1068,19 @@ function checkNewUserData(data)
 io.on('connection', function(client){
   console.log('a user connected');
 
-  //Action to take place when registration is done through facebook
+  //when the user finishes the last step in creating the account using facebook
+  //the page sends to the server the new information and the server updates the 
+  //the user information
   client.on('fb', function(data){
 
     data = JSON.parse(data);
     console.log("THE DATA IS EQUAL TO: ");
     console.log(data);
 
-    // if(!checkNewUserData(data))
-    // {
-    //     console.log("Invalid user data");
-    //     client.emit('invalidData', "-1");
-    //     return;
-    // }
-
     User.findOne({username: data["username"]}, function(err, user) {
 
       if (user)
-      {//Username not taken
+      {
         console.log("it is in ");
         var tutorB = data["type_of_user"] == "Yes" ? true : false;
         var adminB = false;
@@ -1196,8 +1218,9 @@ io.on('connection', function(client){
         });
     });
 
-
-  //Action to take place when a user tries to load a chat from the server.
+  //when the user wants to send a message to another user it sends to the server
+  //a message asking for the room that the message will be sent. If this user never
+  //sent a message to the receiver, a new room is alocated and saved for both users.
   client.on('subscribe', function(data){
 
     User.findOne({username: data.user}, function(err, user) {
@@ -1222,6 +1245,7 @@ io.on('connection', function(client){
 
         console.log("index",index)
 
+        //checking to see if a chat room for both users already exists
         if(index < 0){
 
           Chat.count({},function(err, c){
@@ -1299,13 +1323,15 @@ io.on('connection', function(client){
 
   });
 
-  //Action to take place when a user tries to send a chat message to the server.
+  //message received by server containing the message contents and the sender.
+  //Everyone that is subscribed to the room will receive the message.
   client.on('message', function(data){
         console.log(data);
         io.sockets.in(data.room).emit('message', data);
 
         Chat.findOne({roomName: data.room}, function(err, chat){
 
+          //saving the message to the database
           var addmsg = [];
           if(chat.messages){
             var addMsg = chat.messages.slice(0);

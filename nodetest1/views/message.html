@@ -90,7 +90,7 @@
 
     });
 
-
+    //responsible for receiving the old messages that the user have exchanged with the receiver
     socket.on('message log', function(data){
 
       room = data.room;
@@ -112,6 +112,7 @@
 
     });
 
+    //function called when the send button is pressed, or the enter button is used
     function sendMSG(){
         var data = {msg:$('#m').val(), room:room, sender:<%- JSON.stringify(logged) %>};
         socket.emit('message', data);

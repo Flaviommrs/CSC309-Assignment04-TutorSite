@@ -1,22 +1,7 @@
-$(document).ready(function(){
-
-	FB.getLoginStatus(function(response){
-
-		if(response.status == 'connected'){
-
-			FB.api('/me', function(response){
-
-				logForm(response);
-
-			});
-
-		}
-	});
-
-});
-
+/*Function called when the user wants to sign up using facebook */
 function facebookSignUp(){
 
+	//first it checks if the user is already connected in facebook and if the user has authorized our application
 	FB.getLoginStatus(function(response){
 
 		if(response.status == 'not_authorized'){
@@ -41,6 +26,7 @@ function facebookSignUp(){
 
 }
 
+/*Function called when the user wants to connect through facebook*/
 function facebookLogIn(){
 
 	FB.getLoginStatus(function(response){
@@ -50,9 +36,6 @@ function facebookLogIn(){
 			FB.login(function(response){
 
 				if (response.authResponse) {
-
-					
-						console.log(response);
 
 					    FB.api('/me', function(data) {
 					    	console.log(data);
@@ -71,10 +54,11 @@ function facebookLogIn(){
 
 		}
 
-}	);
+	});
 
 }
 
+/*Auxiliary function that creates the login form to send to the server*/
 function logForm(response){
 
 	var form = document.createElement('form');
@@ -92,6 +76,7 @@ function logForm(response){
 	form.submit();
 }
 
+/*Auxiliary function that creates the sign up form to send to the server*/
 function signUpForm(data){
 
 	var form = document.createElement('form');
