@@ -1,3 +1,6 @@
+@import url(https://fonts.googleapis.com/css?family=Noto+Sans);
+@import url(https://fonts.googleapis.com/css?family=Bree+Serif);
+
 body {
     height:100%;
     background-color: #d8d8d8;
@@ -8,7 +11,7 @@ body {
 p { 
     margin-top: 20px; 
     text-align: center;
-    font: bold 15px 'lucida sans', 'trebuchet MS', 'Tahoma';
+    font-family: 'Noto Sans', sans-serif;
 
 }
 
@@ -17,13 +20,24 @@ table{
     width: 70%;
     border-collapse: collapse;
     margin:auto;
-    font: bold 15px 'lucida sans', 'trebuchet MS', 'Tahoma';
+    font-family: 'Noto Sans', sans-serif;
 
 }
 
 html {
 	height: 100%;
 	width: 100%;
+}
+
+h3 {
+    font-family: 'Bree Serif', serif;
+    text-align: center;
+}
+
+h2 {
+    font-family: 'Bree Serif', serif;
+    text-align: center;
+    font-size: 15px;
 }
 
 .search_box{

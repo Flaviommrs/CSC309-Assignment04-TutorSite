@@ -24,7 +24,7 @@ var userSchema = new mongoose.Schema({
   phone: { type: String, default: "" },
   rate: { type: Number, default: 40 },
   sum_rating: { type: Number, default: 0 },
-  rating_count: { type: Number, default: 1 }
+  rating_count: { type: Number, default: 0 }
 });
 
 var User = mongoose.model('User', userSchema);
