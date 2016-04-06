@@ -348,8 +348,31 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
     }
 });
 
-
-
+/* GET review page. */
+router.get('/reviewuser=*', function(req, res, next) {
+  console.log(req.url);
+    if(req.url.length <= 12)
+    {
+        res.writeHead(404, {"Content-Type": "text/html"});
+        res.write("not found");
+        res.end();
+    }
+    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
+        if (err) return console.error(err);
+        console.dir("Retrived file from db.");
+        if(user[0])
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write(JSON.stringify(user));
+        }
+        else
+        {
+            res.writeHead(200, {"Content-Type": "text/html"});
+            res.write("not found");
+        }
+        res.end();
+    });
+});
 
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
@@ -490,7 +513,9 @@ router.get('/editProfile', function(req, res, next) {
   var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-      res.render('editprofile.html', {userinfo: result});
+      User.findOne({username: result}, function(err, user) {
+        res.render('editprofile.html', {userinfo: user});
+      });
     }
 });
 
