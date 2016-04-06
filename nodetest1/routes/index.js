@@ -355,7 +355,6 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
 
 /* GET review page. */
 router.get('/reviewuser=*', function(req, res, next) {
-  console.log(req.url);
     if(req.url.length <= 12)
     {
         res.writeHead(404, {"Content-Type": "text/html"});
@@ -705,31 +704,30 @@ router.post('/addReview', function(req, res, next){
   };
 
   var pic = "";
-  User.find({username: result}, function(err, user) {
+  User.findOne({username: result}, function(err, user) {
     if (err) return console.error(err);
     pic = user["picture"];
-  });
+    var comment = new Review({reviewee: req.body.tutName, reviewer: result,
+      rating: rating_var, commented: req.body.comment, picture: pic});
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: result,
-  rating: rating_var, commented: req.body.comment, picture: pic});
+    comment.save(function(err, funct) {
+      if(!err){
+        console.dir("New comment.");
 
-  comment.save(function(err, funct) {
-    if(!err){
-      console.dir("New comment.");
+        User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, up) {
+        });
 
-      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, up) {
-      });
+        User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, up) {
+        });
 
-      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, up) {
-      });
-
-      res.redirect("/profile&username=" + req.body.tutName);
-    } else {
+        res.redirect("/profile&username=" + req.body.tutName);
+      } else {
         console.dir("Failed to save comment ");
         console.dir(err);
-    }
+      }
+    });
   });
-}
+  }
 });
 
 /* POST edit store review data. */
@@ -897,7 +895,7 @@ router.post('/addingPicture', function(req, res, next) {
   console.dir(result);
   if(result)
     {
-    User.update({username:result}, {$set:{picture:req.body.profPic}}, function(err, result) {
+    User.update({username:result}, {$set:{picture:"/images/"+req.body.profPic+".jpg"}}, function(err, result) {
       console.dir(req.body.profPic);
     });
     res.redirect("/profile&username=" + result);
