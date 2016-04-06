@@ -164,7 +164,7 @@ router.get('/admin', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
@@ -179,19 +179,19 @@ router.get('/admin', function(req, res, next) {
               }
               else
               {
-                  res.render('admin.html', {result: false});
+                  res.render('admin.html', {result: false, info: null});
               }
 
           }
           else
           {
-              res.render('admin.html', {result: false});
+              res.render('admin.html', {result: false, info: null});
           }
         });
     }
     else
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
 });
 /* GET admin page. */
@@ -199,7 +199,7 @@ router.get('/admin/users', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
@@ -217,19 +217,19 @@ router.get('/admin/users', function(req, res, next) {
               }
               else
               {
-                  res.render('admin.html', {result: false});
+                  res.render('admin.html', {result: false, info: null});
               }
 
           }
           else
           {
-              res.render('admin.html', {result: false});
+              res.render('admin.html', {result: false, info: null});
           }
         });
     }
     else
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
 });
 /* GET admin page. */
@@ -237,7 +237,7 @@ router.get('/admin/chat', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
@@ -255,19 +255,19 @@ router.get('/admin/chat', function(req, res, next) {
               }
               else
               {
-                  res.render('admin.html', {result: false});
+                  res.render('admin.html', {result: false, info: null});
               }
 
           }
           else
           {
-              res.render('admin.html', {result: false});
+              res.render('admin.html', {result: false, info: null});
           }
         });
     }
     else
     {
-        res.render('admin.html', {result: false});
+        res.render('admin.html', {result: false, info: null});
     }
 });
 
