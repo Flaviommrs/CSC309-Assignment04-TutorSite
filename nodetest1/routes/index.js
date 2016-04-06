@@ -537,7 +537,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {});
+        res.render('homepage_user.html', {current: result});
     }
     else
     {
@@ -804,17 +804,18 @@ router.post('/searchFind', function(req, res, next){
   });
 
 
-  User.find({name: searchedTerm, tutor: true}, function(err, name) {
-    resultNames = name;
-    //console.dir(resultNames);
+  User.find({name: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, name) { 
+    resultNames = name; 
     return;
   });
 
-  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
+  User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, rate) { 
+    resultPrice = rate; 
+    return;
+  });
 
-  User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
-    resultSubject = subject;
-    //console.dir(resultSubject);
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
+    resultSubject = sub; 
     return;
   });
 
@@ -831,8 +832,9 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
-        sameLocation = location;
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
+        sameLocation = location; 
+        return;
       });
     });
 
@@ -842,12 +844,10 @@ router.post('/searchFind', function(req, res, next){
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-   User.find({subjects: { $in: [req.body.subject] }, tutor: true}, function(err, subject) {
-     resultSubject = subject;
-     searchedTerm = req.body.subject;
-     //console.dir(resultSubject);
-     return;
-   });
+  User.find({subjects: { $in: [req.body.subject] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
+    resultSubject = sub; 
+    return;
+  });
 
   var secret = 'tutorMeSecretString';
   if(!req.cookies.tutorMeData)
@@ -861,12 +861,13 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
-        sameLocation = location;
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
+        sameLocation = location; 
+        return;
       });
     });
 
-   res.redirect('/search');
+    res.render('search.html', {search: req.body.subject, subject: resultSubject, location: sameLocation, uname: null, names: [], price: []});
  }
  });
 
@@ -875,7 +876,7 @@ router.get('/search', function(req, res, next) {
   //console.dir(searchedTerm);
   //console.dir(resultUsername);
   //console.dir(resultNames);
-  //console.dir(resultPrice);
+  console.dir(resultPrice);
   //console.dir(resultSubject);
 
   res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,

@@ -7,10 +7,18 @@
 	    <link rel="icon" href="images/favicon.png"> 
 	  </head>
 
-	<!-- Header bar -->
+	<!-- Refresh once for database lag -->
+	 <script type="text/javascript">
+	window.onload = function() {
+    if(!window.location.hash) {
+        window.location = window.location + '#refresh';
+        window.location.reload();
+    }
+}
+    </script> 
 
 	<body>
-
+	<!-- Header bar -->
 		<div class="header">
 			<a href="/"><img  id="logo" src="images/logo.png" alt="Logo"></a>		</div>
 		<div class="search_container">
