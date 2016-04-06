@@ -245,7 +245,6 @@ border-radius: 3px 0 0 3px;
     float: left;
 }
 
-
 .button {
     background-color: #137458;
     border: none;
@@ -262,4 +261,8 @@ border-radius: 3px 0 0 3px;
     display: block;
     margin-right: auto;
     margin-left: auto;
+}
+
+::-webkit-input-placeholder { /* Chrome */
+  color: black;
 }
