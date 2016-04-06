@@ -19,6 +19,7 @@
 
     <script>
 
+    //Function to show the subjects if the user decides to tutor
     function showSubjects()
     {
         if(document.getElementById('type_of_user').checked)
@@ -32,7 +33,7 @@
 
     $(document).ready(function() {
 
-        /* initialize the external events
+        /* initialize the external-events
         -----------------------------------------------------------------*/
         $('#external-events .fc-event').each(function() {
 
@@ -66,7 +67,7 @@
 			eventLimit: true, // allow "more" link when too many events
 			events: [],
 
-
+            //Function to delete events when clicked
             eventClick: function(calEvent, jsEvent, view) {
                 //Change the border color of the event to red
                 $(this).css('border-color', 'red');
@@ -81,16 +82,13 @@
 
 		});
 
-        //$('#calendar').fullCalendar('clientEvents');
-
 	});
 
     </script>
 
     <script>
-    //Converting form to JSON
+    //Function to convert form to JSON
     //Source: http://jsfiddle.net/sxGtM/3/ - http://stackoverflow.com/questions/1184624/convert-form-data-to-javascript-object-with-jquery
-
     $.fn.serializeObject = function()
     {
     var o = {};
@@ -108,6 +106,7 @@
     return o;
     };
 
+    //function to remove nulls from array
     function removeNulls(current)
     {
       var newArray = new Array();
@@ -133,8 +132,8 @@
             for (var i = 0; i < myEvents.length; i++)
             {
                 var newEvent = {};
-                // OCCUPIED EVENT = #EF6C00
-                // FREE SLOT = #3a87ad;
+                // OCCUPIED EVENT COLOR = #EF6C00
+                // FREE SLOT COLOR = #3a87ad;
                 newEvent.color = '#3a87ad';
                 newEvent.title = "Available Slot";
                 newEvent.start = myEvents[i].start;
@@ -163,7 +162,7 @@
             subjects = removeNulls(subjects);
 
             /** PARSING OF THE PROFILE PICTURE **/
-            //NOT WORKING
+            //NOT WORKING - WILL PROBABLY DO THIS USING FACEBOOK APIs
             var input = $('#profile_pic');
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -174,12 +173,11 @@
                 reader.readAsDataURL(input.files[0]);
             }
 
-
-
+            //Add information to JSON object
             myJSONObj.events = nonCircularEvents;
             myJSONObj.subjects = subjects;
 
-            /** PARSING OF THE EVENTS **/
+            /** SENDING INFORMATION TO SERVER AND VERIFYING THE RESPONSE **/
             var socket = io.connect('http://localhost:4200');
             socket.on('connect', function(data) {
                 socket.emit('register', JSON.stringify(myJSONObj));

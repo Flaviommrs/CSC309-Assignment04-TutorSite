@@ -19,6 +19,7 @@
 
     <script>
 
+    //Function to save the reservations to the database
     function saveEventChangesToDB()
     {
         var myJSONObj = {};
@@ -31,8 +32,8 @@
         for (var i = 0; i < myEvents.length; i++)
         {
             var newEvent = {};
-            // OCCUPIED EVENT = #EF6C00
-            // FREE SLOT = #3a87ad;
+            // OCCUPIED EVENT COLOR = #EF6C00
+            // FREE SLOT COLOR = #3a87ad;
             newEvent.color = myEvents[i].color;
             newEvent.title = myEvents[i].title;
             newEvent.start = myEvents[i].start;
@@ -81,6 +82,9 @@
             eventLimit: true, // allow "more" link when too many events
             events: eventsReceived,
 
+            /** Function to ask to reserve or cancel a reservation when
+                an event is clicked, according to the user clicked and the
+                current situation of the event **/
             eventClick: function(calEvent, jsEvent, view) {
                 //Change the border color of the event to red
                 $(this).css('border-color', 'red');
