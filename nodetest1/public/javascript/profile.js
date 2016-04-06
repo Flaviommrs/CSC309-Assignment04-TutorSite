@@ -32,12 +32,15 @@ function loadUser(username) {
         document.getElementById("rating").innerHTML = "Overall Rating: " + Number(json["sum_rating"]/json["rating_count"]).toFixed(2);
         document.getElementById("phone").innerHTML = "Phone Number: " + json["phone"];
         document.getElementById("email").innerHTML = "Email: " + json["email"];
-        if(json["location"])
-        {
-            document.getElementById("location").innerHTML = "Location: " + json/*["location"]*/["city"] + ", " + json/*["location"]*/["country"];
+        if(json["city"]) {
+            document.getElementById("location").innerHTML = "Location: " + json["city"];
+            if (json["country"]) {
+                document.getElementById("location").innerHTML += ", " + json["country"];
+            }
         }
-        else
-        {
+        else if (json["country"]){
+            document.getElementById("location").innerHTML = "Location: " + json["country"];
+        } else{
             document.getElementById("location").innerHTML = "Location: Unknown";
         }
 
