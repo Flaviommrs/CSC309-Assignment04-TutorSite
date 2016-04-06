@@ -18,16 +18,6 @@ var Chat = require('../models/chat');
 var Review = require('../models/reviews');
 var currentUser = null;
 
-//DB TESTER PAGE
-router.get('/data', function(req, res, next) {
-
-    User.find({}, function(err, batman) {
-        if (err) return console.error(err);
-        console.dir("Retrived file from db.");
-        res.render('index.html', {group: batman});
-    });
-});
-
 //LOGOUT PAGE
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
@@ -54,15 +44,7 @@ router.post('/usernameTest', function(req, res, next){
 
       });
     }
-      res.redirect('/data');
-  });
-});
-
-/* Test from html file input to server to database */
-router.post('/cleardb', function(req, res, next){
-  User.remove({}, function(err) {
-    console.log('collection removed')
-    res.redirect('/data');
+      res.redirect('/admin/users');
   });
 });
 
@@ -84,7 +66,6 @@ router.post('/LoginAuthentication', function(req, res, next){
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
-        currentUser = log_username;
         //SAVE THE COOKIE
         //var userData = {username: user.username};
         //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
@@ -160,7 +141,8 @@ router.get('/fbsignup&username=*', function (req, res, next){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('homepage_inital.html', {});
+  res.redirect('/homepage');
+  //res.render('homepage_inital.html', {});
 });
 
 /* GET admin page. */
@@ -367,82 +349,90 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
 });
 
 
+
+
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
     res.render('signup.html', {});
 });
 
-
 //POST for edit profile
 router.post('/editingProfile', function(req, res, next){
-  console.dir(req.body.math);
+    var secret = 'tutorMeSecretString';
+    if(!req.cookies.tutorMeData)
+    {
+        res.render('admin.html', {result: false, info: null});
+    }
+    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
 
   if (req.body.name != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{name:req.body.name}}, function(err, result) {
+    User.update({username:result}, {$set:{name:req.body.name}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.number != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{phone:req.body.number}}, function(err, result) {
+    User.update({username:result}, {$set:{phone:req.body.number}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.email != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{email:req.body.email}}, function(err, result) {
+    User.update({username:result}, {$set:{email:req.body.email}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.rate != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{rate:req.body.rate}}, function(err, result) {
+    User.update({username:result}, {$set:{rate:req.body.rate}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.occupation != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{occupation:req.body.occupation}}, function(err, result) {
+    User.update({username:result}, {$set:{occupation:req.body.occupation}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.education != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{education:req.body.education}}, function(err, result) {
+    User.update({username:result}, {$set:{education:req.body.education}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.experience != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{experience:req.body.experience}}, function(err, result) {
+    User.update({username:result}, {$set:{experience:req.body.experience}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.about != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{about:req.body.about}}, function(err, result) {
+    User.update({username:result}, {$set:{about:req.body.about}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.city != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{city:req.body.city}}, function(err, result) {
+    User.update({username:result}, {$set:{city:req.body.city}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.country != '') {
     console.dir("in if");
-    User.update({username:currentUser}, {$set:{country:req.body.country}}, function(err, result) {
+    User.update({username:result}, {$set:{country:req.body.country}}, function(err, result) {
       console.dir("update");
     });
   }
@@ -479,26 +469,29 @@ if (req.body.none == undefined){
 }
 
   if (subject_update.length > 0) {
-    User.update({username:currentUser}, {$set:{subjects:subject_update}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:subject_update}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.none != undefined) {
-    User.update({username:currentUser}, {$set:{subjects:[]}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:[]}}, function(err, result) {
       console.dir("update");
     });
   }
 
-  res.redirect("/profile&username=" + currentUser);
-
+  res.redirect("/profile&username=" + result);
+  }
 });
 
 /* GET edit profile page. */
 router.get('/editProfile', function(req, res, next) {
-  User.findOne({username: currentUser}, function(err, user) {
-    res.render('editprofile.html', {userinfo: user});
-  });
+  var secret = 'tutorMeSecretString';
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+    if(result)
+    {
+      res.render('editprofile.html', {userinfo: result});
+    }
 });
 
 /* GET fb login page. Test*/
@@ -516,7 +509,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {current: currentUser});
+        res.render('homepage_user.html', {});
     }
     else
     {
@@ -533,10 +526,6 @@ router.get('/inbox', function(req, res, next) {
 /* GET links page. */
 router.get('/links', function(req, res, next) {
     res.render('links.html', {});
-});
-
-router.get('/review', function(req, res, next) {
-    res.render('review.html', {});
 });
 
 /* GET message page. */
@@ -557,6 +546,12 @@ router.get('/message', function(req, res, next) {
                 var chats = user.chats;
                 var allTalks = {};
                 var listOfTalks = [];
+
+                if(chats.length == 0)
+                {
+                    res.render('inbox.html', {userNameReceived: result, allTalks: null});
+                }
+
                 for(var i = 0; i < chats.length; i++)
                 {
                     var found = 0;
@@ -565,7 +560,11 @@ router.get('/message', function(req, res, next) {
                         found++;
                         if(chatFound[0])
                         {
-                            var lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            var lastMsg = "";
+                            if(chatFound[0].messages.length != 0)
+                            {
+                                lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                            }
                             var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
                             var talk = {name: userTalkingTo, message: lastMsg, read: read};
                             listOfTalks.push(talk);
@@ -639,7 +638,7 @@ router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
 
-  var rating_var = 0;
+  var rating_var = null;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
@@ -664,55 +663,33 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: currentUser,
+  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
       console.dir("New comment.");
-
-      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, result) {
-      });
-
-      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, result) {
-      });
-
       res.redirect("/profile&username=" + req.body.tutName);
     } else {
         console.dir("Failed to save comment ");
         console.dir(err);
     }
   });
-
 });
 
 /* GET review page. */
-router.get('/reviewuser=*', function(req, res, next) {
-  console.log(req.url);
-    if(req.url.length <= 12)
-    {
-        res.writeHead(404, {"Content-Type": "text/html"});
-        res.write("not found");
-        res.end();
-    }
-    Review.find({reviewee: req.url.substring(12)}, function(err, user) {
-        if (err) return console.error(err);
-        console.dir("Retrived file from db.");
-        if(user[0])
-        {
-            res.writeHead(200, {"Content-Type": "text/html"});
-            res.write(JSON.stringify(user));
-        }
-        else
-        {
-            res.writeHead(200, {"Content-Type": "text/html"});
-            res.write("not found");
-        }
-        res.end();
-    });
+router.get('/review', function(req, res, next) {
+    res.render('review.html', {});
 });
 
 /*
+Search cases:
+user looks for username
+user looks for name
+user looks for area
+user look for price
+user looks subject
+
 recommmendation system based on rating
 */
 
@@ -761,16 +738,15 @@ router.post('/searchFind', function(req, res, next){
 });
 
 //Subject Searchs
-router.post('/searchSubject', function(req, res, next){
-  User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
-    resultSubject = subject;
-    searchedTerm = req.body.subject;
-    //console.dir(resultSubject);
-    return;
-  });
+ router.post('/searchSubject', function(req, res, next){
+   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+     resultSubject = subject;
+     //console.dir(resultSubject);
+     return;
+   });
 
-  res.redirect('/search');
-});
+   res.redirect('/search');
+ });
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
@@ -780,7 +756,7 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, 
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
     price: resultPrice, subject: resultSubject});
 });
 
