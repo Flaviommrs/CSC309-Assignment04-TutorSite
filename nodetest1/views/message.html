@@ -9,21 +9,28 @@
 
     <script>
 
-    $(document).ready(function(){
-        function enterSubmit(e){
+    /*Function to assign the enter key on the message panel to the click
+      function of the message */
+    function assureEnterWorking()
+    {
+        function enterSubmit(e)
+        {
           if(e.keyCode==13)
           {
             $('#send').click();
-            $('#m').keypress(enterSubmit);
             $('#m').focus();
             $('#messageBoard').animate({
                 scrollTop: $('#messageBoard').get(0).scrollHeight
             }, 1500);
-            //$('#messageBoard').scrollTop($('#messageBoard').height());
           }
-
         }
-        $('#m').keypress(enterSubmit);
+        $('#m').focus();
+        $('#m').keydown(enterSubmit);
+    }
+
+    //Calls the assureEnterWorking on page startup
+    $(document).ready(function(){
+        assureEnterWorking()
     });
 
     </script>
@@ -62,8 +69,10 @@
 
     chatData = {user:<%- JSON.stringify(logged) %>, receiver:<%- JSON.stringify(receiver) %>}
 
+    /* Send information to server to identify the user that is logged in */
     socket.emit('subscribe', chatData);
 
+    /* Gets new messages from the server and updates the page accordingly */
     socket.on('message', function(data){
         var myUser = <%- JSON.stringify(logged) %>;
         console.log(data);
@@ -76,8 +85,10 @@
                 $('#messageBoard').html($('#messageBoard').html() + "<div class='msg1'><p>" + data.msg + "</p></div>");
         }
 
-    });
+        //At each update, has to make sure that enter is still working
+        assureEnterWorking();
 
+    });
 
 
     socket.on('message log', function(data){
@@ -97,6 +108,7 @@
           }
       }
 
+      assureEnterWorking();
 
     });
 
@@ -104,6 +116,7 @@
         var data = {msg:$('#m').val(), room:room, sender:<%- JSON.stringify(logged) %>};
         socket.emit('message', data);
         $('#m').val('');
+        assureEnterWorking();
         return false;
     }
 
