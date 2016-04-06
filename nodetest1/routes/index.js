@@ -132,8 +132,9 @@ router.post('/facebookSignUp',function (req, res, next){
 router.get('/fbsignup&username=*', function (req, res, next){
 
 
-  var username = req.url.substring(19);
+  var username = decodeURIComponent(req.url.substring(19));
   console.log(username);
+
 
   res.render('fbsignup.html', {username: username});
 
@@ -469,13 +470,13 @@ if (req.body.none == undefined){
 }
 
   if (subject_update.length > 0) {
-    User.update({username:result}, {$set:{subjects:subject_update}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:subject_update, tutor: true}}, function(err, result) {
       console.dir("update");
     });
   }
 
   if (req.body.none != undefined) {
-    User.update({username:result}, {$set:{subjects:[]}}, function(err, result) {
+    User.update({username:result}, {$set:{subjects:[], tutor :false}}, function(err, result) {
       console.dir("update");
     });
   }
@@ -637,8 +638,17 @@ router.get('/message&username=*', function(req, res, next) {
 router.post('/addReview', function(req, res, next){
   console.dir(req.body.tutName);
   console.dir(req.body.comment);
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
 
-  var rating_var = null;
+  var rating_var = 0;
 
   if (req.body.star1 != undefined){
     console.dir(req.body.star1);
@@ -663,35 +673,80 @@ router.post('/addReview', function(req, res, next){
   };
 
 
-  var comment = new Review({reviewee: req.body.tutName, reviewer: "tester",
+  var comment = new Review({reviewee: req.body.tutName, reviewer: result,
   rating: rating_var, commented: req.body.comment});
 
   comment.save(function(err, funct) {
     if(!err){
       console.dir("New comment.");
+
+      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, up) {
+      });
+
+      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, up) {
+      });
+
       res.redirect("/profile&username=" + req.body.tutName);
     } else {
         console.dir("Failed to save comment ");
         console.dir(err);
     }
   });
+}
+});
+
+/* POST edit store review data. */
+router.post('/likeReview=*', function(req, res, next){
+  var username = req.url.substring(12);
+    Review.findOne({reviewer: username}, function(err, review) {
+        var likelist = review["likelist"];
+        res.writeHead(200, {"Content-Type": "text/html"});
+        if (likelist.indexOf(username)<0){
+          likelist.push(username);
+          review["likelist"] = likelist;
+          review["likes"] += 1;
+          review.save(function(err, funct) {
+            if(!err){
+                console.dir("Review Updated.");
+            } else {
+                console.dir("Failed to update Review");
+                console.dir(err);
+            }
+          });
+        }
+      res.write(review["likes"].toString());
+      res.end();
+    });
+});
+
+/* POST edit store review data. */
+router.post('/dislikeReview=*', function(req, res, next){
+  var username = req.url.substring(15);
+    Review.findOne({reviewer: username}, function(err, review) {
+        var likelist = review["likelist"];
+        res.writeHead(200, {"Content-Type": "text/html"});
+        if (likelist.indexOf(username)>=0){
+          likelist.splice(likelist.indexOf(username), 1);
+          review["likelist"] = likelist;
+          review["likes"] -= 1;
+          review.save(function(err, funct) {
+            if(!err){
+                console.dir("Review Updated.");
+            } else {
+                console.dir("Failed to update Review");
+                console.dir(err);
+            }
+          });
+        }
+      res.write(review["likes"].toString());
+      res.end();
+    });
 });
 
 /* GET review page. */
 router.get('/review', function(req, res, next) {
     res.render('review.html', {});
 });
-
-/*
-Search cases:
-user looks for username
-user looks for name
-user looks for area
-user look for price
-user looks subject
-
-recommmendation system based on rating
-*/
 
 /* POST search page */
 var searchedTerm = null;
@@ -700,64 +755,96 @@ var resultNames = null;
 var resultPrice = null;
 var resultSubject = null;
 var reccommened = null;
+var sameLocation = null;
 
 router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
-  console.dir(searchedTerm);
+  //console.dir(searchedTerm);
 
   /* Find username */
-  User.findOne({username: searchedTerm}, function(err, user) {
+  User.findOne({username: searchedTerm, tutor: true}, function(err, user) {
     resultUsername = user;
     //console.dir(resultUsername);
     return;
   });
 
-  User.find({name: searchedTerm}, function(err, name) {
+
+  User.find({name: searchedTerm, tutor: true}, function(err, name) {
     resultNames = name;
     //console.dir(resultNames);
     return;
   });
 
-  User.find({rate: searchedTerm}, function(err, price) {
-    resultPrice = price;
-    //console.dir(resultPrice);
-    return;
-  });
+  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
 
-  User.find({subjects: { $in: [searchedTerm] }}, function(err, subject) {
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
     resultSubject = subject;
     //console.dir(resultSubject);
     return;
   });
 
   /* Recommended feature */
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    //Find current user location
+    User.find({username: result}, function(err, user) {
+      console.dir(user[0].city);
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
+        sameLocation = location;
+      });
+    });
 
-
-  res.redirect('/search');
-
+    res.redirect('/search');
+  }
 });
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+   User.find({subjects: { $in: [req.body.subject] }, tutor: true}, function(err, subject) {
      resultSubject = subject;
+     searchedTerm = req.body.subject;
      //console.dir(resultSubject);
      return;
    });
 
+  var secret = 'tutorMeSecretString';
+  if(!req.cookies.tutorMeData)
+    {
+        res.redirect('/');
+    }
+  var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+  console.dir(result);
+  if(result)
+    {
+    //Find current user location
+    User.find({username: result}, function(err, user) {
+      console.dir(user[0].city);
+      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
+        sameLocation = location;
+      });
+    });
+
    res.redirect('/search');
+ }
  });
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
-  console.dir(searchedTerm);
-  console.dir(resultUsername);
-  console.dir(resultNames);
-  console.dir(resultPrice);
-  console.dir(resultSubject);
+  //console.dir(searchedTerm);
+  //console.dir(resultUsername);
+  //console.dir(resultNames);
+  //console.dir(resultPrice);
+  //console.dir(resultSubject);
 
   res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
-    price: resultPrice, subject: resultSubject});
+    price: resultPrice, subject: resultSubject, location: sameLocation});
 });
 
 /* GET weekview page. */
@@ -1059,44 +1146,56 @@ io.on('connection', function(client){
 
         if(index < 0){
 
-          Chat.count(function(err, c){
+          Chat.count({},function(err, c){
 
             room = c;
+            var messages = [];
+
+            //creates a new room for the conversation
+            var chatRoom = new Chat({roomName: room, messages:messages});
+            chatRoom.save(function(err, funct) {
+              console.dir("New room Saved.");
+            });
+
+            var userChats = chats.slice(0);
+            var chatUser = {room:room, user: data.receiver};
+
+            userChats.push(chatUser);
+
+            user.chats = userChats;
+
+            user.save();
+
+            User.findOne({username: data.receiver}, function(err, receiver){
+
+              var reChats = receiver.chats.slice(0);
+
+              var chatReceiver = {room:room, user: data.user};
+
+              reChats.push(chatReceiver);
+
+              receiver.chats = reChats;
+
+              receiver.save();
+
+            });
+
+            console.log(data.user, ' logging into room ', room);
+            client.join(room);
+
+            Chat.findOne({roomName: room}, function(err, chatRoom){
+
+              if(chatRoom){
+
+                var log = {room: room, log:chatRoom.messages};
+
+                client.emit('message log', log);
+              }
+
+            });
 
           });
-          var messages = [];
-
-          //creates a new room for the conversation
-          var chatRoom = new Chat({roomName: room, messages:messages});
-          chatRoom.save(function(err, funct) {
-            console.dir("New room Saved.");
-          });
-
-          var userChats = chats.slice(0);
-          var chatUser = {room:room, user: data.receiver};
-
-          userChats.push(chatUser);
-
-          user.chats = userChats;
-
-          user.save();
-
-          User.findOne({username: data.receiver}, function(err, receiver){
-
-            var reChats = receiver.chats.slice(0);
-
-            var chatReceiver = {room:room, user: data.user};
-
-            reChats.push(chatReceiver);
-
-            receiver.chats = reChats;
-
-            receiver.save();
-
-          });
-
-          console.log(data.user, ' logging into room ', room);
-          client.join(room);
+          
 
         }else{
           room = chats[index].room;
@@ -1104,18 +1203,18 @@ io.on('connection', function(client){
           console.log(data.user, ' logging into room ', room);
           client.join(room);
 
+          Chat.findOne({roomName: room}, function(err, chatRoom){
+
+            if(chatRoom){
+
+              var log = {room: room, log:chatRoom.messages};
+
+              client.emit('message log', log);
+            }
+
+          });
+
         }
-
-        Chat.findOne({roomName: room}, function(err, chatRoom){
-
-          if(chatRoom){
-
-            var log = {room: room, log:chatRoom.messages};
-
-            client.emit('message log', log);
-          }
-
-        });
 
       }
     });
