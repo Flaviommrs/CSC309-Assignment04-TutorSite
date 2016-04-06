@@ -253,15 +253,8 @@ border-radius: 3px 0 0 3px;
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 2%;
+    margin-top: 7%;
     padding: 0;
-}
-
-#reviews > p {
-    text-align: center;
-    margin-bottom: 2%;
-    font-weight: bold;
-    font-size: 1.5em;
 }
 
 .review {
@@ -295,7 +288,7 @@ border-radius: 3px 0 0 3px;
 }
 
 .rightreview {
-    width: 50%;
+    width: 78%;
     position: relative;
 }
 
@@ -317,6 +310,11 @@ border-radius: 3px 0 0 3px;
     margin-right: 20px;
 }
 
+.righttop {
+    float: right;
+    margin-right: 0;
+}
+
 #reviews button {
     background-color: #137458;
     border: none;
@@ -331,4 +329,14 @@ border-radius: 3px 0 0 3px;
 .center {
     margin-left: auto;
     margin-right: auto;
+}
+
+.re {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    background-color: #137458;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    color: white;
 }
