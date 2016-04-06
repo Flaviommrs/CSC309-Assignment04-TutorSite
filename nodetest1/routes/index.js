@@ -98,14 +98,15 @@ router.post('/facebookSignUp',function (req, res, next){
   var password = req.body.password;
   var name = req.body.name;
   var email = req.body.email;
+  var profile = req.body.profilePicture;
 
-  console.log(username,password, name, email);
+  console.log(username,password, name, email, profile) ;
 
   User.findOne({username: username}, function (err, user) {
 
-    if (!user)
+    if (!user)  
     {//Username not taken
-      var input_user = new User({name:username, email:email, username: username, password: password});
+      var input_user = new User({name:username, email:email, username: username, password: password, picture: profile});
       console.log("This is the input_user:");
       console.log(input_user);
       input_user.save(function(err, funct) {
