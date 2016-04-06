@@ -16,6 +16,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
+var currentUser = null;
 
 //DB TESTER PAGE
 router.get('/data', function(req, res, next) {
@@ -83,6 +84,7 @@ router.post('/LoginAuthentication', function(req, res, next){
       //Password matches and go through
       if (user.password == log_password) {
         console.dir("User found and password matches.");
+        currentUser = log_username;
         //SAVE THE COOKIE
         //var userData = {username: user.username};
         //res.cookie('tutorMeData' , JSON.stringify(userData), {expire : new Date() + 9999});
@@ -391,7 +393,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {});
+        res.render('homepage_user.html', {current: currentUser});
     }
     else
     {
@@ -607,6 +609,17 @@ router.post('/searchFind', function(req, res, next){
 
   res.redirect('/search');
 
+});
+
+//Subject Searchs
+router.post('/searchSubject', function(req, res, next){
+  User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
+    resultSubject = subject;
+    //console.dir(resultSubject);
+    return;
+  });
+
+  res.redirect('/search');
 });
 
 /* GET search page. */

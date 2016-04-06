@@ -3,7 +3,7 @@
 
 body {
     height:100%;
-    background-color: #ffffff;
+    background-color: #b1b1b1;
     margin:0px;
     width: 100%;
 }
@@ -159,6 +159,7 @@ float: left;
   text-decoration: none;
   font-weight: normal;
 }
+
 #cssmenu a:hover {
   color: #fff;
   padding-bottom: 8px;
@@ -170,4 +171,27 @@ float: left;
   padding: 0;
   min-width: 250px;
   height: 100%;
+}
+
+#subjects li {
+    list-style: none;
+    font-family: 'Bree Serif', serif;
+    text-align: center;
+    margin-bottom: -40px;
+}
+
+#subjects li:hover {
+    margin-bottom: -40px;
+}
+
+#subjects h3:hover {
+  color: white;
+}
+#subjects {
+  background: #b1b1b1;
+}
+
+
+#subjects input {
+    visibility:hidden;
 }

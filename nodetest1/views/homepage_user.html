@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <!--Head Info-->
   <head>
     <link rel="stylesheet" type="text/css" href="/stylesheets/homepage_user.css">
@@ -21,20 +22,52 @@
 
 <div id='cssmenu'>
 <ul>
-   <li class='active'><a href='#'><span>Your Profile</span></a></li>
+   <li class='active'><a href='/profile&username=<%= current %>'><span>Your Profile</span></a></li>
    <li><a href='/review'><span>Review A Tutor</span></a></li>
    <li><a href='/message'><span>Your Messages</span></a></li>
 </ul>
 </div>
 
-<ul class="subjects">
-  <li><a href="#"><div><h3>View Math Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View Biology Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View Chemistry Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View Physics Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View Geography Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View English Tutors</h3></div></li>
-  <li><a href="#"><div><h3>View History Tutors</h3></div></li>
+
+<div id='subjects'>
+<ul>
+<form action="/searchSubject"  method='post'>
+  <li>  
+    <label for="math"><h3>View Math Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" name="subject" id="math" value="Math">
+  </li>
+
+  <li>  
+    <label for="bio"><h3>View Biology Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="bio" name="subject" value="Biology">
+  </li>
+
+  <li>  
+    <label for="chem"><h3>View Chemistry Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="chem" name="subject" value="Chemistry">
+  </li>
+
+  <li>  
+    <label for="phys"><h3>View Physics Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="phys" name="subject" value="Physics">
+  </li>
+
+  <li>  
+    <label for="geo"><h3>View Geography Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="geo" name="subject" value="Geography">
+  </li>
+
+  <li>  
+    <label for="eng"><h3>View English Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="eng" name="subject" value="English">
+  </li>
+
+  <li>  
+    <label for="his"><h3>View History Tutors</h3></label>
+    <input onChange='this.form.submit();' type="radio" id="his" name="subject" value="History">
+  </li>
 </ul>
+</form>
+</div>
 
 </html>  
