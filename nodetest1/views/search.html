@@ -28,11 +28,13 @@
 <% if (uname) { %>
 	<h3> Tutors with the username <%=search %> </h3>
 	<ul class="rig columns-4">
+	<a href="/profile&username=<%= uname.username %>">
 		<li>
 			<img src="images/pri_001.jpg" />
 			<h3><%= uname.username %></h3>
 			<p>Name: <%=uname.name %></p>
 		</li>
+	</a>
 	</ul>
 <% } %>
 
@@ -41,11 +43,13 @@
 	<h3> Tutors with the name <%=search %> </h3>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < names.length; i++){ %>
+		<a href="/profile&username=<%= names[i].username %>">
 		<li>
 			<img src="images/pri_001.jpg" />
 			<h3><%= names[i].username %></h3>
 			<p>Name: <%=names[i].name %></p>
 		</li>
+		</a>
 		<% } %>
 	</ul>
 <% } %>
@@ -55,11 +59,13 @@
 	<h3> Tutors with the rate of $<%=search %> </h3>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < price.length; i++){ %>
+		<a href="/profile&username=<%= price[i].username %>">
 		<li>
 			<img src="images/pri_001.jpg" />
 			<h3><%= price[i].username %></h3>
 			<p>Name: <%=price[i].name %></p>
 		</li>
+		</a>
 		<% } %>
 	</ul>
 <% } %>
@@ -69,11 +75,13 @@
 	<h3> Tutors who teach <%=search %> </h3>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < subject.length; i++){ %>
+		<a href="/profile&username=<%= subject[i].username %>">
 		<li>
 			<img src="images/pri_001.jpg" />
 			<h3><%= subject[i].username %></h3>
 			<p>Name: <%=subject[i].name %></p>
 		</li>
+		</a>
 		<% } %>
 	</ul>
 <% } %>
