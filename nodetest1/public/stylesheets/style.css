@@ -13,11 +13,11 @@ html {
 	width: 100%;
 }
 
-h1 {
+h1, input{
     font-family: 'Bree Serif', serif;
 }
 
-label, legend, h4, input {
+label, legend, h4{
     font-family: 'Noto Sans', sans-serif;
     font-size: 14.5px;
 }
