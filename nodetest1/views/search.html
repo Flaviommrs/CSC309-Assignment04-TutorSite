@@ -35,6 +35,7 @@
 			<p>Name: <%=uname.name %></p>
 			<p>Location: <%=uname.city %> , <%=uname.country %></p>
 			<p>Tutoring: <%=uname.subjects %></p>
+			<p>Average Rating: <%=uname.sum_rating / uname.rating_count %></p>
 
 		</li>
 	</a>
@@ -53,6 +54,7 @@
 			<p>Name: <%=names[i].name %></p>
 			<p>Location: <%=names[i].city %> , <%=names[i].country %></p>
 			<p>Tutoring: <%=names[i].subjects %></p>
+			<p>Average Rating: <%=names[i].sum_rating / names[i].rating_count %></p>
 		</li>
 		</a>
 		<% } %>
@@ -71,6 +73,7 @@
 			<p>Name: <%=price[i].name %></p>
 			<p>Location: <%=price[i].city %> , <%=price[i].country %></p>
 			<p>Tutoring: <%=price[i].subjects %></p>
+			<p>Average Rating: <%=price[i].sum_rating / price[i].rating_count %></p>
 		</li>
 		</a>
 		<% } %>
