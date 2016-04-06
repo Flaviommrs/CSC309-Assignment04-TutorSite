@@ -366,16 +366,81 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
 });
 
 
-
-
 /* GET signup page. */
 router.get('/signup', function(req, res, next) {
     res.render('signup.html', {});
 });
 
+
+//POST for edit profile
+router.post('/editingProfile', function(req, res, next){
+  console.dir(req.body.number);
+
+  if (req.body.name != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{name:req.body.name}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.number != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{phone:req.body.number}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.email != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{email:req.body.email}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.rate != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{rate:req.body.rate}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.occupation != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{occupation:req.body.occupation}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.education != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{education:req.body.education}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.experience != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{experience:req.body.experience}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  if (req.body.about != '') {
+    console.dir("in if");
+    User.update({username:currentUser}, {$set:{about:req.body.about}}, function(err, result) {
+      console.dir("update");
+    });
+  }
+
+  res.redirect("/profile&username=" + currentUser);
+
+});
+
 /* GET edit profile page. */
 router.get('/editProfile', function(req, res, next) {
-    res.render('editprofile.html', {});
+  User.findOne({username: currentUser}, function(err, user) {
+    res.render('editprofile.html', {userinfo: user});
+  });
 });
 
 /* GET fb login page. Test*/
