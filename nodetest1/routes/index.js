@@ -125,12 +125,12 @@ router.post('/facebookSignUp',function (req, res, next){
 
   res.redirect('/fbsignup&username=' + username);
 });
-router.get('/fbsignup&username=*', function (req, res, next){
 
+/*code resposible for redirecting the user to the next step in the sign up using facebook*/
+router.get('/fbsignup&username=*', function (req, res, next){
 
   var username = decodeURIComponent(req.url.substring(19));
   console.log(username);
-
 
   res.render('fbsignup.html', {username: username});
 
@@ -522,11 +522,6 @@ router.get('/editProfile', function(req, res, next) {
         res.render('editprofile.html', {userinfo: user});
       });
     }
-});
-
-/* GET fb login page. Test*/
-router.get('/facebookLog', function(req, res, next) {
-    res.render('facebookLog.html', {});
 });
 
 /* GET user homepage page. */
@@ -1041,24 +1036,19 @@ function checkNewUserData(data)
 io.on('connection', function(client){
   console.log('a user connected');
 
-  //Action to take place when registration is done through facebook
+  //when the user finishes the last step in creating the account using facebook
+  //the page sends to the server the new information and the server updates the 
+  //the user information
   client.on('fb', function(data){
 
     data = JSON.parse(data);
     console.log("THE DATA IS EQUAL TO: ");
     console.log(data);
 
-    // if(!checkNewUserData(data))
-    // {
-    //     console.log("Invalid user data");
-    //     client.emit('invalidData', "-1");
-    //     return;
-    // }
-
     User.findOne({username: data["username"]}, function(err, user) {
 
       if (user)
-      {//Username not taken
+      {
         console.log("it is in ");
         var tutorB = data["type_of_user"] == "Yes" ? true : false;
         var adminB = false;
@@ -1196,8 +1186,9 @@ io.on('connection', function(client){
         });
     });
 
-
-  //Action to take place when a user tries to load a chat from the server.
+  //when the user wants to send a message to another user it sends to the server
+  //a message asking for the room that the message will be sent. If this user never
+  //sent a message to the receiver, a new room is alocated and saved for both users.
   client.on('subscribe', function(data){
 
     User.findOne({username: data.user}, function(err, user) {
@@ -1222,6 +1213,7 @@ io.on('connection', function(client){
 
         console.log("index",index)
 
+        //checking to see if a chat room for both users already exists
         if(index < 0){
 
           Chat.count({},function(err, c){
@@ -1299,13 +1291,15 @@ io.on('connection', function(client){
 
   });
 
-  //Action to take place when a user tries to send a chat message to the server.
+  //message received by server containing the message contents and the sender.
+  //Everyone that is subscribed to the room will receive the message.
   client.on('message', function(data){
         console.log(data);
         io.sockets.in(data.room).emit('message', data);
 
         Chat.findOne({roomName: data.room}, function(err, chat){
 
+          //saving the message to the database
           var addmsg = [];
           if(chat.messages){
             var addMsg = chat.messages.slice(0);
