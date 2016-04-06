@@ -571,6 +571,7 @@ var resultUsername = null;
 var resultNames = null;
 var resultPrice = null;
 var resultSubject = null;
+var reccommened = null;
 
 router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
@@ -616,7 +617,8 @@ router.get('/search', function(req, res, next) {
   console.dir(resultPrice);
   console.dir(resultSubject);
 
-  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, price: resultPrice, subject: resultSubject});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames.sort({rating:-1}), 
+    price: resultPrice.sort({rating:-1}), subject: resultSubject.sort({rating:-1})});
 });
 
 /* GET weekview page. */
