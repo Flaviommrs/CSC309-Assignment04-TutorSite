@@ -17,16 +17,6 @@ var User = require('../models/user');
 var Chat = require('../models/chat');
 var Review = require('../models/reviews');
 
-//DB TESTER PAGE
-router.get('/data', function(req, res, next) {
-
-    User.find({}, function(err, batman) {
-        if (err) return console.error(err);
-        console.dir("Retrived file from db.");
-        res.render('index.html', {group: batman});
-    });
-});
-
 //LOGOUT PAGE
 router.get('/logout', function(req, res, next) {
     res.clearCookie('tutorMeData');
@@ -53,15 +43,7 @@ router.post('/usernameTest', function(req, res, next){
 
       });
     }
-      res.redirect('/data');
-  });
-});
-
-/* Test from html file input to server to database */
-router.post('/cleardb', function(req, res, next){
-  User.remove({}, function(err) {
-    console.log('collection removed')
-    res.redirect('/data');
+      res.redirect('/admin/users');
   });
 });
 
