@@ -340,3 +340,9 @@ border-radius: 3px 0 0 3px;
     padding-bottom: 2%;
     color: white;
 }
+
+.head {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 0;
+}
