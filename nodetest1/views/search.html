@@ -26,13 +26,17 @@
 
 <!-- Username -->
 <% if (uname) { %>
-	<h3> Tutors with the username <%=search %> </h3>
+	<h2> Tutors with the username <%=search %> </h2>
 	<ul class="rig columns-4">
 	<a href="/profile&username=<%= uname.username %>">
 		<li>
 			<img src="images/pri_001.jpg" />
 			<h3><%= uname.username %></h3>
 			<p>Name: <%=uname.name %></p>
+			<p>Location: <%=uname.city %> , <%=uname.country %></p>
+			<p>Tutoring: <%=uname.subjects %></p>
+			<p>Average Rating: <%=uname.sum_rating / uname.rating_count %></p>
+
 		</li>
 	</a>
 	</ul>
@@ -40,7 +44,7 @@
 
 <!-- Name -->
 <% if (names && names.length >0) { %>
-	<h3> Tutors with the name <%=search %> </h3>
+	<h2> Tutors with the name <%=search %> </h2>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < names.length; i++){ %>
 		<a href="/profile&username=<%= names[i].username %>">
@@ -48,6 +52,9 @@
 			<img src="images/pri_001.jpg" />
 			<h3><%= names[i].username %></h3>
 			<p>Name: <%=names[i].name %></p>
+			<p>Location: <%=names[i].city %> , <%=names[i].country %></p>
+			<p>Tutoring: <%=names[i].subjects %></p>
+			<p>Average Rating: <%=names[i].sum_rating / names[i].rating_count %></p>
 		</li>
 		</a>
 		<% } %>
@@ -56,7 +63,7 @@
 
 <!-- Price -->
 <% if (price && price.length >0) { %>
-	<h3> Tutors with the rate of $<%=search %> </h3>
+	<h2> Tutors with the rate of $<%=search %> </h2>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < price.length; i++){ %>
 		<a href="/profile&username=<%= price[i].username %>">
@@ -64,6 +71,9 @@
 			<img src="images/pri_001.jpg" />
 			<h3><%= price[i].username %></h3>
 			<p>Name: <%=price[i].name %></p>
+			<p>Location: <%=price[i].city %> , <%=price[i].country %></p>
+			<p>Tutoring: <%=price[i].subjects %></p>
+			<p>Average Rating: <%=price[i].sum_rating / price[i].rating_count %></p>
 		</li>
 		</a>
 		<% } %>
@@ -72,7 +82,7 @@
 
 <!-- Subject -->
 <% if (subject && subject.length >0) { %>
-	<h3> Tutors who teach <%=search %> </h3>
+	<h2> Tutors who teach <%=search %> </h2>
 	<ul class="rig columns-4">
 		<% for(var i=0; i < subject.length; i++){ %>
 		<a href="/profile&username=<%= subject[i].username %>">
@@ -80,6 +90,9 @@
 			<img src="images/pri_001.jpg" />
 			<h3><%= subject[i].username %></h3>
 			<p>Name: <%=subject[i].name %></p>
+			<p>Location: <%=subject[i].city %> , <%=subject[i].country %></p>
+			<p>Tutoring: <%=subject[i].subjects %></p>
+			<p>Average Rating: <%=subject[i].sum_rating / subject[i].rating_count %></p>
 		</li>
 		</a>
 		<% } %>

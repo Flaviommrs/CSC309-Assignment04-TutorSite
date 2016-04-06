@@ -669,12 +669,20 @@ router.post('/addReview', function(req, res, next){
   comment.save(function(err, funct) {
     if(!err){
       console.dir("New comment.");
+
+      User.update({username:req.body.tutName}, {$inc:{sum_rating: rating_var}}, function(err, result) {
+      });
+
+      User.update({username:req.body.tutName}, {$inc:{rating_count: 1}}, function(err, result) {
+      });
+
       res.redirect("/profile&username=" + req.body.tutName);
     } else {
         console.dir("Failed to save comment ");
         console.dir(err);
     }
   });
+
 });
 
 /* GET review page. */
@@ -704,13 +712,6 @@ router.get('/reviewuser=*', function(req, res, next) {
 });
 
 /*
-Search cases:
-user looks for username
-user looks for name
-user looks for area
-user look for price
-user looks subject
-
 recommmendation system based on rating
 */
 
@@ -762,6 +763,7 @@ router.post('/searchFind', function(req, res, next){
 router.post('/searchSubject', function(req, res, next){
   User.find({subjects: { $in: [req.body.subject] }}, function(err, subject) {
     resultSubject = subject;
+    searchedTerm = req.body.subject;
     //console.dir(resultSubject);
     return;
   });
