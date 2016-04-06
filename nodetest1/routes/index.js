@@ -159,6 +159,7 @@ router.get('/fbsignup', function (req, res, next){
 router.get('/', function(req, res, next) {
   res.render('homepage_inital.html', {});
 });
+
 /* GET admin page. */
 router.get('/admin', function(req, res, next) {
     var secret = 'tutorMeSecretString';
@@ -463,52 +464,65 @@ router.get('/review', function(req, res, next) {
 Search cases:
 user looks for username
 user looks for name
+user looks for area
+user look for price
 user looks subject
 
 recommmendation system based on rating
 */
 
-/* POST search page - find user. */
+/* POST search page */
 var searchedTerm = null;
-var searchResults = null;
+var resultUsername = null;
+var resultNames = null;
+var resultPrice = null;
+var resultSubject = null;
 
-/* Search Results - search usernames */
 router.post('/searchFind', function(req, res, next){
   searchedTerm = req.body.search;
   console.dir(searchedTerm);
 
-  //Find user based on username - should result in one user
+  /* Find username */
   User.findOne({username: searchedTerm}, function(err, user) {
-    if (user == null){ //username not found
-      console.dir("User not found - searching names");
-
-        //Find the real name of the user
-        User.find ({name: searchedTerm}, function(err, users) {
-          if (users.length == 0) {
-            console.dir("Users not found");
-            res.redirect('/data');
-          } else {
-            User.find ({name: searchedTerm}, function(err, users) {
-              console.dir("Users found");
-              console.dir(users);
-              searchResults = users;
-              res.redirect("/search");
-            });
-          }
-        });
-
-    } else {
-        console.dir("User found");
-        searchResults = user;
-        res.redirect("/profile&username=" + searchedTerm);
-    }
+    resultUsername = user;
+    //console.dir(resultUsername);
+    return;
   });
-})
+
+  User.find({name: searchedTerm}, function(err, name) {
+    resultNames = name;
+    //console.dir(resultNames);
+    return;
+  });
+
+  User.find({rate: searchedTerm}, function(err, price) {
+    resultPrice = price;
+    //console.dir(resultPrice);
+    return;
+  });
+
+  User.find({subjects: { $in: [searchedTerm] }}, function(err, subject) {
+    resultSubject = subject;
+    //console.dir(resultSubject);
+    return;
+  });
+
+  /* Recommended feature */
+
+
+  res.redirect('/search');
+
+});
 
 /* GET search page. */
 router.get('/search', function(req, res, next) {
+  console.dir(searchedTerm);
+  console.dir(resultUsername);
+  console.dir(resultNames);
+  console.dir(resultPrice);
+  console.dir(resultSubject);
 
-    res.render('search.html', {search: searchedTerm, results: searchResults});
+  res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames, price: resultPrice, subject: resultSubject});
 });
 
 /* GET weekview page. */
