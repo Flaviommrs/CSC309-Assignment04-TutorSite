@@ -27,11 +27,7 @@ router.get('/logout', function(req, res, next) {
 
 /* Inserts new basic user to the database - used by admin page */
 router.post('/usernameTest', function(req, res, next){
-
-  console.dir(req.body.uname);
-  console.dir(req.body.pword);
   User.findOne({username: req.body.uname}, function(err, user) {
-  console.dir("Inside find.");
     if (!user) {//Username not taken
       var input_user = new User({name: req.body.realname, username: req.body.uname, password: req.body.pword});
 
@@ -53,9 +49,6 @@ router.post('/usernameTest', function(req, res, next){
 router.post('/LoginAuthentication', function(req, res, next){
   var log_username = req.body.username;
   var log_password = req.body.password;
-
-  console.dir(log_username);
-  console.dir(log_password);
 
   //Find user in user database
   User.findOne({username: log_username}, function(err, user) {
@@ -105,14 +98,15 @@ router.post('/facebookSignUp',function (req, res, next){
   var password = req.body.password;
   var name = req.body.name;
   var email = req.body.email;
+  var profile = req.body.profilePicture;
 
-  console.log(username,password, name, email);
+  console.log(username,password, name, email, profile) ;
 
   User.findOne({username: username}, function (err, user) {
 
-    if (!user)
+    if (!user)  
     {//Username not taken
-      var input_user = new User({name:username, email:email, username: username, password: password});
+      var input_user = new User({name:username, email:email, username: username, password: password, picture: profile});
       console.log("This is the input_user:");
       console.log(input_user);
       input_user.save(function(err, funct) {
@@ -145,7 +139,10 @@ router.get('/', function(req, res, next) {
   res.redirect('/homepage');
 });
 
-/* GET admin page. */
+/* GET admin page.
+    result -> boolean responsible for granting access to the admin page
+    info -> sensitive DB information to be displayed on the admin page
+*/
 router.get('/admin', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -180,7 +177,10 @@ router.get('/admin', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
-/* GET admin page. */
+/* GET admin page.
+    result -> boolean responsible for granting access to the admin page
+    info -> sensitive DB information to be displayed on the admin page
+*/
 router.get('/admin/users', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -218,7 +218,10 @@ router.get('/admin/users', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
-/* GET admin page. */
+/* GET admin page.
+    result -> boolean responsible for granting access to the admin page
+    info -> sensitive DB information to be displayed on the admin page
+*/
 router.get('/admin/chat', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -256,7 +259,7 @@ router.get('/admin/chat', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
-/*DELETE USER FROM DB*/
+/*DELETE USER FROM DB - verifies if is admin first*/
 router.get('/admin/delete&username=*', function(req, res, next) {
     if(req.url <= 23)
     {
@@ -298,7 +301,7 @@ router.get('/admin/delete&username=*', function(req, res, next) {
         res.render('admin.html', {result: false, info: null});
     }
 });
-/*DELETE CHATROOM FROM DB*/
+/*DELETE CHATROOM FROM DB - verifies if it is admin first*/
 router.get('/admin/delete&roomname=*', function(req, res, next) {
     console.log("Right where I should be");
     if(req.url <= 23)
@@ -534,7 +537,7 @@ router.get('/homepage', function(req, res, next) {
     var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
     if(result)
     {
-        res.render('homepage_user.html', {});
+        res.render('homepage_user.html', {current: result});
     }
     else
     {
@@ -542,10 +545,7 @@ router.get('/homepage', function(req, res, next) {
     }
 });
 
-/* GET inbox page. */
-router.get('/inbox', function(req, res, next) {
-    res.redirect('/message');
-});
+
 
 
 /* GET links page. */
@@ -553,7 +553,14 @@ router.get('/links', function(req, res, next) {
     res.render('links.html', {});
 });
 
-/* GET message page. */
+/* Alternate path for message */
+router.get('/inbox', function(req, res, next) {
+    res.redirect('/message');
+});
+/* GET message page. - all users recently messaged by the current user
+    userNameReceived -> current user
+    allTalks -> users recently messaged, with the last message sent in this chat
+*/
 router.get('/message', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -616,7 +623,11 @@ router.get('/message', function(req, res, next) {
     }
 });
 
-/*Get message page from the logged user*/
+/*Get message page from the logged user and the user required. Creates a
+  chat between them if no chat between them is found.
+  logged -> user that is logged
+  received -> user on the other end, to receive the messages.
+  */
 router.get('/message&username=*', function(req, res, next) {
 
     var secret = 'tutorMeSecretString';
@@ -793,17 +804,18 @@ router.post('/searchFind', function(req, res, next){
   });
 
 
-  User.find({name: searchedTerm, tutor: true}, function(err, name) {
-    resultNames = name;
-    //console.dir(resultNames);
+  User.find({name: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, name) { 
+    resultNames = name; 
     return;
   });
 
-  //User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}, function(err, cursor){console.dir(cursor)});
+  User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, rate) { 
+    resultPrice = rate; 
+    return;
+  });
 
-  User.find({subjects: { $in: [searchedTerm] } , tutor: true}, function(err, subject) {
-    resultSubject = subject;
-    //console.dir(resultSubject);
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
+    resultSubject = sub; 
     return;
   });
 
@@ -820,8 +832,9 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
-        sameLocation = location;
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
+        sameLocation = location; 
+        return;
       });
     });
 
@@ -831,12 +844,10 @@ router.post('/searchFind', function(req, res, next){
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-   User.find({subjects: { $in: [req.body.subject] }, tutor: true}, function(err, subject) {
-     resultSubject = subject;
-     searchedTerm = req.body.subject;
-     //console.dir(resultSubject);
-     return;
-   });
+  User.find({subjects: { $in: [req.body.subject] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
+    resultSubject = sub; 
+    return;
+  });
 
   var secret = 'tutorMeSecretString';
   if(!req.cookies.tutorMeData)
@@ -850,12 +861,13 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}, function(err, location) {
-        sameLocation = location;
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
+        sameLocation = location; 
+        return;
       });
     });
 
-   res.redirect('/search');
+    res.render('search.html', {search: req.body.subject, subject: resultSubject, location: sameLocation, uname: null, names: [], price: []});
  }
  });
 
@@ -864,14 +876,14 @@ router.get('/search', function(req, res, next) {
   //console.dir(searchedTerm);
   //console.dir(resultUsername);
   //console.dir(resultNames);
-  //console.dir(resultPrice);
+  console.dir(resultPrice);
   //console.dir(resultSubject);
 
   res.render('search.html', {search: searchedTerm, uname: resultUsername, names: resultNames,
     price: resultPrice, subject: resultSubject, location: sameLocation});
 });
 
-/* GET weekview page. */
+/* GET weekview page. - gets the schedule of the user that is logged in */
 router.get('/weekView', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -889,6 +901,7 @@ router.get('/weekView', function(req, res, next) {
         res.redirect('/');
     }
 });
+/* GET weekview page. - gets the schedule of the user that is asked for */
 router.get('/weekView&username=*', function(req, res, next) {
 
     var secret = 'tutorMeSecretString';
@@ -931,14 +944,7 @@ router.get('/weekView&username=*', function(req, res, next) {
 
 });
 
-/* GET weekview page. */
-router.get('/registration', function(req, res, next) {
-    console.log("I just received the following data: ");
-    res.render('weekview.html', {});
-    //console.log(req.query.data);
-});
-
-/* GET profile page. */
+/* GET profile page for the username requested */
 router.get('/profile&username=*', function(req, res, next) {
     var secret = 'tutorMeSecretString';
     if(!req.cookies.tutorMeData)
@@ -1004,6 +1010,7 @@ router.get('/username=*', function(req, res, next) {
 
 });
 
+/* Helper function to see if the data of a user that is trying to sign up is valid*/
 function checkNewUserData(data)
 {
     var toTest = [];
@@ -1026,9 +1033,13 @@ function checkNewUserData(data)
     return true;
 }
 
+/* Socket.io connection on port 4200. This is used to exchange chat messages
+   and to transfer complex JSON objects from pages to the server and vice-versa.
+*/
 io.on('connection', function(client){
   console.log('a user connected');
 
+  //Action to take place when registration is done through facebook
   client.on('fb', function(data){
 
     data = JSON.parse(data);
@@ -1077,6 +1088,8 @@ io.on('connection', function(client){
 
   });
 
+  //Action to take place when admin page tries to update a entry on the
+  //user table of the database.
   client.on('updateDBEntryUser', function(data) {
         data = JSON.parse(data);
 
@@ -1109,7 +1122,9 @@ io.on('connection', function(client){
         });
     });
 
-  client.on('updateEvs', function(data) {
+    //Action to take place when a calendar event is changed. This could be due
+    //to a time-slot reservation or cancellation on the /weekview page.
+    client.on('updateEvs', function(data) {
         data = JSON.parse(data);
 
         //TODO: CHECK FOR VALID USER MAKING MODIFICATIONS - NO SECURITY HERE FOR NOW
@@ -1138,7 +1153,8 @@ io.on('connection', function(client){
         });
     });
 
-  client.on('register', function(data) {
+    //Action to take place when the regular sign up is used.
+    client.on('register', function(data) {
         data = JSON.parse(data);
         console.log("THE DATA IS EQUAL TO: ");
         console.log(data);
@@ -1179,6 +1195,7 @@ io.on('connection', function(client){
     });
 
 
+  //Action to take place when a user tries to load a chat from the server.
   client.on('subscribe', function(data){
 
     User.findOne({username: data.user}, function(err, user) {
@@ -1280,6 +1297,7 @@ io.on('connection', function(client){
 
   });
 
+  //Action to take place when a user tries to send a chat message to the server.
   client.on('message', function(data){
         console.log(data);
         io.sockets.in(data.room).emit('message', data);
@@ -1301,6 +1319,7 @@ io.on('connection', function(client){
 
 });
 
+//Intializing Socket.io server on port 4200
 http.listen(4200, function(){
   console.log('listening SOCKET on *:4200');
 });

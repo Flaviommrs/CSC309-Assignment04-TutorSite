@@ -24,7 +24,7 @@ function facebookSignUp(){
 
 				if(response.authResponse){
 
-					FB.api('/me?fields=email,name,location,hometown', function(data){
+					FB.api('/me?fields=email,name,location,hometown,picture', function(data){
 						console.log(data);
 						signUpForm(data);
 					});
@@ -99,6 +99,7 @@ function signUpForm(data){
 	var password = document.createElement('input');
 	var email = document.createElement('input');
 	var name = document.createElement('input');
+	var profilePicture = document.createElement('input');
 
 	form.method = "POST";
 	form.action = "/facebookSignUp";
@@ -111,11 +112,14 @@ function signUpForm(data){
 	password.name = "password"
 	email.value = data.email;
 	email.name = "email";
+	profilePicture.value = data.picture.data.url;
+	profilePicture.name = "profilePicture"
 
 	form.appendChild(username);
 	form.appendChild(password);
 	form.appendChild(email);
 	form.appendChild(name);
+	form.appendChild(profilePicture);
 
 	document.body.appendChild(form);
 
