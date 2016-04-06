@@ -1,43 +1,44 @@
 var uname = "";
 
-function seeSched()
-{
-    if(uname != "")
-    {
-            window.location.href = '/weekView&username=' + uname;
-    }
-}
-function sendMsg()
-{
-    if(uname != "")
-    {
-            window.location.href = '/message&username=' + uname;
+function seeSched() {
+    if(uname != "") {
+        window.location.href = '/weekView&username=' + uname;
     }
 }
 
-function likeReview(id){
+function sendMsg() {
+    if(uname != "") {
+        window.location.href = '/message&username=' + uname;
+    }
+}
+
+function likeReview(id) {
     var reviewer = id.substring(4);
     var request = $.ajax({
         method: "POST",
         url: "/likeReview=" + reviewer
     });
+
     request.done(function(msg) {
         document.getElementById(reviewer+"likes").innerHTML = "Likes: " + msg;
     });
+
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );
     });
 }
 
-function dislikeReview(id){
+function dislikeReview(id) {
     var reviewer = id.substring(7);
     var request = $.ajax({
         method: "POST",
         url: "/dislikeReview=" + reviewer
     });
+
     request.done(function(msg) {
         document.getElementById(reviewer+"likes").innerHTML = "Likes: " + msg;
     });
+
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );
     });
@@ -61,21 +62,22 @@ function loadUser(username) {
         document.getElementById("rating").innerHTML = "Overall Rating: " + Number(json["sum_rating"]/json["rating_count"]).toFixed(2);
         document.getElementById("phone").innerHTML = "Phone Number: " + json["phone"];
         document.getElementById("email").innerHTML = "Email: " + json["email"];
+
         if(json["city"]) {
             document.getElementById("location").innerHTML = "Location: " + json["city"];
             if (json["country"]) {
                 document.getElementById("location").innerHTML += ", " + json["country"];
             }
-        }
-        else if (json["country"]){
+        }else if (json["country"]) {
             document.getElementById("location").innerHTML = "Location: " + json["country"];
-        } else{
+        }else {
             document.getElementById("location").innerHTML = "Location: Unknown";
         }
 
         document.getElementById("tutoring").innerHTML = "Tutoring: " + json["subjects"];
         document.getElementById("rate").innerHTML = "Base Rate Per Hour: " + json["rate"];
     });
+
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );
         uname = "";
@@ -87,6 +89,7 @@ function loadReviews(username) {
         method: "GET",
         url: "/reviewuser=" + username
     });
+
     request.done(function(msg) {
         var json = JSON.parse(msg);
         document.getElementById("reviews").innerHTML += `<p class="re">REVIEWS</p>`
@@ -97,7 +100,7 @@ function loadReviews(username) {
                             <img id="reviewpic" src="/images/profile.jpg" alt="Profile Picture">
                         </div>
                         <div class="rightreview">
-                            <p class="righttop" id="`+json[index]["reviewer"]+`likes">Likes: ` + json[index]["likes"] + `</p>
+                            <p class="righttop" id="` + json[index]["reviewer"] + `likes">Likes: ` + json[index]["likes"] + `</p>
                             <p>Rating: ` + json[index]["rating"] + `/5</p>
                             <p> ` + json[index]["commented"] + `</p>
                         </div>
@@ -106,20 +109,18 @@ function loadReviews(username) {
                         <p>User: ` + json[index]["reviewer"] + `</p>
                     </div>
                     <div class="right">
-                        <button class="ratereview" id="like`+json[index]["reviewer"]+`" onclick="likeReview(this.id)">Like</button>
-                        <button class="ratereview" id="dislike`+json[index]["reviewer"]+`" onclick="dislikeReview(this.id)">Dislike</button>
+                        <button class="ratereview" id="like` + json[index]["reviewer"] + `" onclick="likeReview(this.id)">Like</button>
+                        <button class="ratereview" id="dislike` + json[index]["reviewer"] + `" onclick="dislikeReview(this.id)">Dislike</button>
                     </div>
                 </div>`;
             document.getElementById("reviews").innerHTML += string;
         }
     });
+
     request.fail(function( jqXHR, textStatus ) {
         alert( "Request failed: " + textStatus );
     });
 };
 
-if(window.location.pathname.length > 18)
-{
-    loadUser(window.location.pathname.substring(18));
-    loadReviews(window.location.pathname.substring(18));
-}
+loadUser(window.location.pathname.substring(18));
+loadReviews(window.location.pathname.substring(18));
