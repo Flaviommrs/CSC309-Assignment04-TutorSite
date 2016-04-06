@@ -11,7 +11,7 @@
     <script src='javascript/fullcalendar/fullcalendar.js'></script>
     <script src='javascript/fullcalendar/fullcalendar.min.js'></script>
     <script src='javascript/lib/jquery-ui.custom.min.js'></script>
-    <link rel="stylesheet" type="text/css" href="/stylesheets/styleCAL.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
     <title>Tutor Me - Registration Page</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
 
@@ -24,9 +24,11 @@
         if(document.getElementById('type_of_user').checked)
         {
                 $('#subjects').css('visibility', 'visible');
+                $('#wrap').css('visibility', 'visible');
         }
         else {
                 $('#subjects').css('visibility', 'hidden');
+                $('#wrap').css('visibility', 'hidden');
         }
     }
 
@@ -88,6 +90,20 @@
     </script>
 
     <script>
+    var socket = io.connect('http://localhost:4200');
+
+    socket.on('failedDB', function(data) {
+                alert("Some unexpected problem happened on saving your data. Please try again.");
+    });
+    socket.on('invalidData', function(data) {
+        //Do nothing
+        alert("Invalid Data. Please verify your data and try again.");
+    });
+    socket.on('success', function(data) {
+        alert("Thank you for registering. Please login now.");
+        window.location.href = '/';
+    });
+
     //Converting form to JSON
     //Source: http://jsfiddle.net/sxGtM/3/ - http://stackoverflow.com/questions/1184624/convert-form-data-to-javascript-object-with-jquery
 
@@ -162,43 +178,17 @@
             ];
             subjects = removeNulls(subjects);
 
-            /** PARSING OF THE PROFILE PICTURE **/
-            //NOT WORKING
-            var input = $('#profile_pic');
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    alert(e.result);
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            }
-
-
-
             myJSONObj.events = nonCircularEvents;
             myJSONObj.subjects = subjects;
+            myJSONObj.username = <%- JSON.stringify(username) %>;
+
+            myJSONObj.username = myJSONObj.username.replace("%20", " ")
 
             /** PARSING OF THE EVENTS **/
-            var socket = io.connect('http://localhost:4200');
-            socket.on('connect', function(data) {
-                socket.emit('register', JSON.stringify(myJSONObj));
-                socket.on('failedDB', function(data) {
-                    alert("Some unexpected problem happened on saving your data. Please try again.");
-                });
-                socket.on('invalidData', function(data) {
-                    //Do nothing
-                    alert("Invalid Data. Please verify your data and try again.");
-                });
-                socket.on('duplicatedUsername', function(data) {
-                    //Do nothing
-                    alert("Please select another username.");
-                });
-                socket.on('success', function(data) {
-                    alert("Thank you for registering. Please login now.");
-                    window.location.href = '/';
-                });
-            });
+
+            alert(myJSONObj);
+            
+            socket.emit('fb', JSON.stringify(myJSONObj));
 
             return false;
         });
@@ -222,26 +212,11 @@
         <fieldset>
             <legend>Register</legend>
                 <div id='register_labels'>
-                    <label for='name'>Name*:</label>
-                    <br/>
-                    <label for='email' >Email Address*:</label>
-                    <br/>
-                    <label for='username' >UserName*:</label>
-                    <br/>
-                    <label for='password' >Password*:</label>
                     <br/>
                     <label for='type_of_user' >Do you want to Tutor?</label>
                     <br/>
                 </div>
                 <div id='register_inputs'>
-                    <input type='text' name='name' id='name' maxlength="50" size="25" required/>
-                    <br/>
-                    <input type='text' name='email' id='email' maxlength="50" size="25"  required/>
-                    <br/>
-                    <input type='text' name='username' id='username' maxlength="20" size="25" required/>
-                    <br/>
-                    <input type='password' name='password' id='password' maxlength="25" size="25" required/>
-                    <br/>
                     <input type='checkbox' name='type_of_user' id='type_of_user' value="Yes"/ onchange="showSubjects()">
                     <br/>
                 </div>
@@ -270,9 +245,8 @@
                 </fieldset>
                 <br/>
                 <br/>
-                <br/>
-                <br/>
-                <div id='wrap'>
+
+                <div id='wrap' style="visibility: hidden">
                     <div id='external-events'>
             			<h4>Drag the Slots to the periods of the week you usually have available:</h4>
             			<div class='fc-event'>Available Slot</div>
@@ -294,7 +268,9 @@
                 </div>
                 <br/>
                 <br/>
-                <div class="main_button_holder"><input class=main_button type='submit' name='Submit' value='Register to TutorMe'/></div>
+                <div class="main_button_holder">
+                	<input class=main_button type='submit' name='Submit' value='Register to TutorMe'/>
+                </div>
         </fieldset>
     </form>
 </div>
