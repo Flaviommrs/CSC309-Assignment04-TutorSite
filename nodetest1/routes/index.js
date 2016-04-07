@@ -591,11 +591,10 @@ router.get('/message', function(req, res, next) {
         var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
         if(result)
         {
-            User.find({username: result}, function(err, user) {
+            User.findOne({username: result}, function(err, user) {
                 if (err) return console.error(err);
-                if(user[0])
+                if(user)
                 {
-                    var user = user[0];
                     var chats = user.chats;
                     var allTalks = {};
                     var listOfTalks = [];
@@ -609,14 +608,14 @@ router.get('/message', function(req, res, next) {
                     {
                         var found = 0;
                         var userTalkingTo = chats[i].user;
-                        Chat.find({roomName: chats[i].room}, function(err, chatFound) {
+                        Chat.findOne({roomName: chats[i].room}, function(err, chatFound) {
                             found++;
-                            if(chatFound[0])
+                            if(chatFound)
                             {
                                 var lastMsg = "";
-                                if(chatFound[0].messages.length != 0)
+                                if(chatFound.messages.length != 0)
                                 {
-                                    lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                                    lastMsg = chatFound.messages[chatFound.messages.length - 1].msg;
                                 }
                                 var read = 0; //FUTURE IMPLEMENTATION - THIS WOULD JUST MAKE THE COLOR VARY TO READ OR UNREAD MESSAGES
                                 var talk = {name: userTalkingTo, message: lastMsg, read: read};
@@ -671,9 +670,9 @@ router.get('/message&username=*', function(req, res, next) {
             else
             {
                 var uname = req.url.substring(18);
-                User.find({username: uname}, function(err, user) {
+                User.findOne({username: uname}, function(err, user) {
                     if (err) return console.error(err);
-                    if(user[0])
+                    if(user)
                     {
                         res.render('message.html', {logged: uname_logged, receiver: uname});
                     }
@@ -974,11 +973,11 @@ router.get('/weekView&username=*', function(req, res, next) {
         else
         {
             var uname = req.url.substring(19);
-            User.find({username: uname}, function(err, user) {
+            User.findOne({username: uname}, function(err, user) {
                 if (err) return console.error(err);
-                if(user[0])
+                if(user)
                 {
-                    var user_events = user[0].events;
+                    var user_events = user.events;
                     res.render('weekview.html', {events: JSON.stringify(user_events), uname: uname, uname_logged: uname_logged});
                 }
                 else
@@ -1016,9 +1015,9 @@ router.get('/profile&username=*', function(req, res, next) {
         else
         {
             var uname = decodeURIComponent(req.url.substring(18));
-            User.find({username: uname}, function(err, user) {
+            User.findOne({username: uname}, function(err, user) {
                 if (err) return console.error(err);
-                if(user[0])
+                if(user)
                 {
                     console.log(uname);
                     res.render('profile.html', {uname:uname});
@@ -1048,13 +1047,13 @@ router.get('/username=*', function(req, res, next) {
         res.write("not found");
         res.end();
     }
-    User.find({username: decodeURIComponent(req.url.substring(10))}, function(err, user) {
+    User.findOne({username: decodeURIComponent(req.url.substring(10))}, function(err, user) {
         if (err) return console.error(err);
         console.dir("Retrived file from db.");
-        if(user[0])
+        if(user)
         {
             res.writeHead(200, {"Content-Type": "text/html"});
-            res.write(JSON.stringify(user[0]));
+            res.write(JSON.stringify(user));
         }
         else
         {
