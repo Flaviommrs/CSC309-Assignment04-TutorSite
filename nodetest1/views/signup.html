@@ -33,6 +33,10 @@
 
     $(document).ready(function() {
 
+        /*CALENDAR CODES WERE ADAPTED FROM THE EXAMPLES AVAILABLE ON THE
+        FULLCALENDAR FRAMEWORK PAGE:
+        //http://fullcalendar.io/docs/views/Available_Views/
+        */
         /* initialize the external-events
         -----------------------------------------------------------------*/
         $('#external-events .fc-event').each(function() {
@@ -118,11 +122,41 @@
       return newArray;
     }
 
+    function checkAllForms()
+    {
+        //Function to check all the forms for the righ format of the inputs
+        //As of right now, this function checks only for the password strength,
+        //but it can easily be changed to check other things, such as if the
+        //e-mail has the correct format, or if the inputs do not have any script
+        //that may be trying to be executed.
+        var passwordReceived = document.getElementById('password').value;
+        var lowercase = /[a-z]+/;
+        var uppercase = /[A-Z]+/;
+        var number = /[0-9]+/;
+        var pass = true;
+        if(passwordReceived.search(lowercase) == -1)
+        {
+            pass = false;
+        }
+        if(passwordReceived.search(uppercase) == -1)
+        {
+            pass = false;
+        }
+        if(passwordReceived.search(number) == -1)
+        {
+            pass = false;
+        }
+        return pass;
+    }
+
     $(function() {
         $('form').submit(function() {
 
-            //TODO: implement this function
-            //checkAllForms();
+            if(!checkAllForms())
+            {
+                alert("Your password must contain both a lowercase and uppercase letter, and a number.");
+                return false;
+            }
 
             /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
@@ -272,7 +306,7 @@
                 <br/>
                 <div id='wrap'>
                     <div id='external-events'>
-            			<h4>Drag the Slots to the periods of the week you usually have available:</h4>
+            			<h4>Drag the Slots to the periods of the week you usually have available.</h4>
             			<div class='fc-event'>Available Slot</div>
             			<div class='fc-event'>Available Slot</div>
             			<div class='fc-event'>Available Slot</div>
@@ -285,7 +319,7 @@
                         <div class='fc-event'>Available Slot</div>
             			<div class='fc-event'>Available Slot</div>
                         <div class='fc-event'>Available Slot</div>
-            			<div class='fc-event'>Available Slot</div>
+                        <b> TIP: You can click on an event to delete it </b>
             		</div>
                     <div id='calendar'></div>
                     <div style='clear:both'></div>

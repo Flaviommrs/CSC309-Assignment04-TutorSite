@@ -56,6 +56,10 @@
 
     $(document).ready(function() {
 
+        /*CALENDAR CODES WERE ADAPTED FROM THE EXAMPLES AVAILABLE ON THE
+        FULLCALENDAR FRAMEWORK PAGE:
+        //http://fullcalendar.io/docs/views/Available_Views/
+        */
         /* initialize the calendar
         -----------------------------------------------------------------*/
 
@@ -98,7 +102,7 @@
                             calEvent.title = 'Available Slot';
                             calEvent.color = '#3a87ad';
                             $('#calendar').fullCalendar('updateEvent', calEvent);
-                            //TODO: Save changes to database here
+                            //Save changes to database here
                             saveEventChangesToDB();
                         }
 
@@ -119,7 +123,7 @@
                     calEvent.title = <%- JSON.stringify(uname_logged) %>;
                     calEvent.color = '#EF6C00';
                     $('#calendar').fullCalendar('updateEvent', calEvent);
-                    //TODO: Save changes to database here
+                    //Save changes to database here
                     saveEventChangesToDB();
                 }
                 //return border to previous color
@@ -145,6 +149,7 @@
 </div>
 <div class="content">
 <h1>Schedule for <i><%=uname %></i></h1>
+<h2 align="center">Click on an event to reserve/cancel the reservation</h2>
 <div id='calendar'></div>
 
 </div>

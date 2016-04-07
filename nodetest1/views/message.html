@@ -114,9 +114,12 @@
 
     //function called when the send button is pressed, or the enter button is used
     function sendMSG(){
-        var data = {msg:$('#m').val(), room:room, sender:<%- JSON.stringify(logged) %>};
-        socket.emit('message', data);
-        $('#m').val('');
+        if($('#m').val().trim() != "")
+        {
+            var data = {msg:$('#m').val(), room:room, sender:<%- JSON.stringify(logged) %>};
+            socket.emit('message', data);
+            $('#m').val('');
+        }
         assureEnterWorking();
         return false;
     }
