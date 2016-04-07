@@ -138,9 +138,6 @@
     $(function() {
         $('form').submit(function() {
 
-            //TODO: implement this function
-            //checkAllForms();
-
             /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
             var myEvents = $('#calendar').fullCalendar('clientEvents');
@@ -183,7 +180,7 @@
             myJSONObj.username = <%- JSON.stringify(username) %>;
 
             /** PARSING OF THE EVENTS **/
-            
+
             socket.emit('fb', JSON.stringify(myJSONObj));
 
             return false;

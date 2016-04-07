@@ -98,7 +98,7 @@
                             calEvent.title = 'Available Slot';
                             calEvent.color = '#3a87ad';
                             $('#calendar').fullCalendar('updateEvent', calEvent);
-                            //TODO: Save changes to database here
+                            //Save changes to database here
                             saveEventChangesToDB();
                         }
 
@@ -119,7 +119,7 @@
                     calEvent.title = <%- JSON.stringify(uname_logged) %>;
                     calEvent.color = '#EF6C00';
                     $('#calendar').fullCalendar('updateEvent', calEvent);
-                    //TODO: Save changes to database here
+                    //Save changes to database here
                     saveEventChangesToDB();
                 }
                 //return border to previous color
