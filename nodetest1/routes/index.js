@@ -66,7 +66,7 @@ router.post('/LoginAuthentication', function(req, res, next){
         var secret = 'tutorMeSecretString';
         var val = cookieSign.sign(user.username, secret);
         res.clearCookie('tutorMeData');
-        res.cookie('tutorMeData' , val, {expire : new Date() + 9999});
+        res.cookie('tutorMeData' , val, {maxAge : 3600000}); //Cookie will delete himself within 1 hour.
 
         res.redirect('/homepage');
       } else {
@@ -106,7 +106,7 @@ router.post('/facebookSignUp',function (req, res, next){
 
   User.findOne({username: username}, function (err, user) {
 
-    if (!user)  
+    if (!user)
     {//Username not taken
       var input_user = new User({name:username, email:email, username: username, password: password, picture: profile});
       console.log("This is the input_user:");
@@ -151,32 +151,35 @@ router.get('/admin', function(req, res, next) {
     {
         res.render('admin.html', {result: false, info: null});
     }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
+    else
     {
-        User.findOne({username: result}, function(err, user) {
+        var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+        if(result)
+        {
+            User.findOne({username: result}, function(err, user) {
 
-          if (user)
-          {
-              if(user.admin)
+              if (user)
               {
-                  res.render('admin.html', {result: true, info: null});
+                  if(user.admin)
+                  {
+                      res.render('admin.html', {result: true, info: null});
+                  }
+                  else
+                  {
+                      res.render('admin.html', {result: false, info: null});
+                  }
+
               }
               else
               {
                   res.render('admin.html', {result: false, info: null});
               }
-
-          }
-          else
-          {
-              res.render('admin.html', {result: false, info: null});
-          }
-        });
-    }
-    else
-    {
-        res.render('admin.html', {result: false, info: null});
+            });
+        }
+        else
+        {
+            res.render('admin.html', {result: false, info: null});
+        }
     }
 });
 /* GET admin page.
@@ -189,35 +192,39 @@ router.get('/admin/users', function(req, res, next) {
     {
         res.render('admin.html', {result: false, info: null});
     }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
+    else
     {
-        User.findOne({username: result}, function(err, user) {
 
-          if (user)
-          {
-              if(user.admin)
+        var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+        if(result)
+        {
+            User.findOne({username: result}, function(err, user) {
+
+              if (user)
               {
-                  User.find({}, function(err, db_data) {
-                      if (err) return console.error(err);
-                      res.render('admin.html', {result: true, info: db_data});
-                  });
+                  if(user.admin)
+                  {
+                      User.find({}, function(err, db_data) {
+                          if (err) return console.error(err);
+                          res.render('admin.html', {result: true, info: db_data});
+                      });
+                  }
+                  else
+                  {
+                      res.render('admin.html', {result: false, info: null});
+                  }
+
               }
               else
               {
                   res.render('admin.html', {result: false, info: null});
               }
-
-          }
-          else
-          {
-              res.render('admin.html', {result: false, info: null});
-          }
-        });
-    }
-    else
-    {
-        res.render('admin.html', {result: false, info: null});
+            });
+        }
+        else
+        {
+            res.render('admin.html', {result: false, info: null});
+        }
     }
 });
 /* GET admin page.
@@ -230,35 +237,39 @@ router.get('/admin/chat', function(req, res, next) {
     {
         res.render('admin.html', {result: false, info: null});
     }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
+    else
     {
-        User.findOne({username: result}, function(err, user) {
 
-          if (user)
-          {
-              if(user.admin)
+        var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+        if(result)
+        {
+            User.findOne({username: result}, function(err, user) {
+
+              if (user)
               {
-                  Chat.find({}, function(err, db_data) {
-                      if (err) return console.error(err);
-                      res.render('admin.html', {result: true, info: db_data});
-                  });
+                  if(user.admin)
+                  {
+                      Chat.find({}, function(err, db_data) {
+                          if (err) return console.error(err);
+                          res.render('admin.html', {result: true, info: db_data});
+                      });
+                  }
+                  else
+                  {
+                      res.render('admin.html', {result: false, info: null});
+                  }
+
               }
               else
               {
                   res.render('admin.html', {result: false, info: null});
               }
-
-          }
-          else
-          {
-              res.render('admin.html', {result: false, info: null});
-          }
-        });
-    }
-    else
-    {
-        res.render('admin.html', {result: false, info: null});
+            });
+        }
+        else
+        {
+            res.render('admin.html', {result: false, info: null});
+        }
     }
 });
 /*DELETE USER FROM DB - verifies if is admin first*/
@@ -267,40 +278,46 @@ router.get('/admin/delete&username=*', function(req, res, next) {
     {
         res.redirect('/admin/users');
     }
-    var secret = 'tutorMeSecretString';
-    if(!req.cookies.tutorMeData)
-    {
-        res.render('admin.html', {result: false, info: null});
-    }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
-    {
-        User.findOne({username: result}, function(err, user) {
-
-          if (user)
-          {
-              if(user.admin)
-              {
-                  var userToDelete = req.url.substring(23);
-                  User.remove({ username: userToDelete }, function(err) {
-                    res.redirect('/admin/users');
-                  });
-              }
-              else
-              {
-                  res.render('admin.html', {result: false, info: null});
-              }
-
-          }
-          else
-          {
-              res.render('admin.html', {result: false, info: null});
-          }
-        });
-    }
     else
     {
-        res.render('admin.html', {result: false, info: null});
+        var secret = 'tutorMeSecretString';
+        if(!req.cookies.tutorMeData)
+        {
+            res.render('admin.html', {result: false, info: null});
+        }
+        else
+        {
+            var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+            if(result)
+            {
+                User.findOne({username: result}, function(err, user) {
+
+                  if (user)
+                  {
+                      if(user.admin)
+                      {
+                          var userToDelete = req.url.substring(23);
+                          User.remove({ username: userToDelete }, function(err) {
+                            res.redirect('/admin/users');
+                          });
+                      }
+                      else
+                      {
+                          res.render('admin.html', {result: false, info: null});
+                      }
+
+                  }
+                  else
+                  {
+                      res.render('admin.html', {result: false, info: null});
+                  }
+                });
+            }
+            else
+            {
+                res.render('admin.html', {result: false, info: null});
+            }
+        }
     }
 });
 /*DELETE CHATROOM FROM DB - verifies if it is admin first*/
@@ -310,46 +327,52 @@ router.get('/admin/delete&roomname=*', function(req, res, next) {
     {
         res.redirect('/admin/chat');
     }
-    var secret = 'tutorMeSecretString';
-    if(!req.cookies.tutorMeData)
-    {
-        res.render('admin.html', {result: false, info: null});
-    }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
-    {
-        User.findOne({username: result}, function(err, user) {
-
-          if (user)
-          {
-              if(user.admin)
-              {
-                  try
-                  {
-                        var chatToDelete = parseInt(req.url.substring(23));
-                        Chat.remove({ roomName: chatToDelete }, function(err) {
-                          res.redirect('/admin/chat');
-                        });
-                  } catch (e)
-                  {
-                      res.redirect('/admin/chat');
-                  }
-              }
-              else
-              {
-                  res.render('admin.html', {result: false, info: null});
-              }
-
-          }
-          else
-          {
-              res.render('admin.html', {result: false, info: null});
-          }
-        });
-    }
     else
     {
-        res.render('admin.html', {result: false, info: null});
+        var secret = 'tutorMeSecretString';
+        if(!req.cookies.tutorMeData)
+        {
+            res.render('admin.html', {result: false, info: null});
+        }
+        else
+        {
+            var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+            if(result)
+            {
+                User.findOne({username: result}, function(err, user) {
+
+                  if (user)
+                  {
+                      if(user.admin)
+                      {
+                          try
+                          {
+                                var chatToDelete = parseInt(req.url.substring(23));
+                                Chat.remove({ roomName: chatToDelete }, function(err) {
+                                  res.redirect('/admin/chat');
+                                });
+                          } catch (e)
+                          {
+                              res.redirect('/admin/chat');
+                          }
+                      }
+                      else
+                      {
+                          res.render('admin.html', {result: false, info: null});
+                      }
+
+                  }
+                  else
+                  {
+                      res.render('admin.html', {result: false, info: null});
+                  }
+                });
+            }
+            else
+            {
+                res.render('admin.html', {result: false, info: null});
+            }
+        }
     }
 });
 
@@ -564,59 +587,62 @@ router.get('/message', function(req, res, next) {
     {
         res.render('homepage_inital.html', {});
     }
-    var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(result)
-    {
-        User.find({username: result}, function(err, user) {
-            if (err) return console.error(err);
-            if(user[0])
-            {
-                var user = user[0];
-                var chats = user.chats;
-                var allTalks = {};
-                var listOfTalks = [];
-
-                if(chats.length == 0)
-                {
-                    res.render('inbox.html', {userNameReceived: result, allTalks: null});
-                }
-
-                for(var i = 0; i < chats.length; i++)
-                {
-                    var found = 0;
-                    var userTalkingTo = chats[i].user;
-                    Chat.find({roomName: chats[i].room}, function(err, chatFound) {
-                        found++;
-                        if(chatFound[0])
-                        {
-                            var lastMsg = "";
-                            if(chatFound[0].messages.length != 0)
-                            {
-                                lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
-                            }
-                            var read = 0; //TODO: Change this to actual read or not read values - FUTURE IMPLEMENTATION
-                            var talk = {name: userTalkingTo, message: lastMsg, read: read};
-                            listOfTalks.push(talk);
-                        }
-                        if(found == chats.length)
-                        {
-                            allTalks.results = listOfTalks;
-                            res.render('inbox.html', {userNameReceived: result, allTalks: JSON.stringify(allTalks)});
-                        }
-                    });
-                }
-            }
-            else
-            {
-                res.writeHead(404, {"Content-Type": "text/html"});
-                res.write("not found");
-                res.end();
-            }
-        });
-    }
     else
     {
-        res.render('homepage_inital.html', {});
+        var result = cookieSign.unsign(req.cookies.tutorMeData, secret);
+        if(result)
+        {
+            User.find({username: result}, function(err, user) {
+                if (err) return console.error(err);
+                if(user[0])
+                {
+                    var user = user[0];
+                    var chats = user.chats;
+                    var allTalks = {};
+                    var listOfTalks = [];
+
+                    if(chats.length == 0)
+                    {
+                        res.render('inbox.html', {userNameReceived: result, allTalks: null});
+                    }
+
+                    for(var i = 0; i < chats.length; i++)
+                    {
+                        var found = 0;
+                        var userTalkingTo = chats[i].user;
+                        Chat.find({roomName: chats[i].room}, function(err, chatFound) {
+                            found++;
+                            if(chatFound[0])
+                            {
+                                var lastMsg = "";
+                                if(chatFound[0].messages.length != 0)
+                                {
+                                    lastMsg = chatFound[0].messages[chatFound[0].messages.length - 1].msg;
+                                }
+                                var read = 0; //FUTURE IMPLEMENTATION - THIS WOULD JUST MAKE THE COLOR VARY TO READ OR UNREAD MESSAGES
+                                var talk = {name: userTalkingTo, message: lastMsg, read: read};
+                                listOfTalks.push(talk);
+                            }
+                            if(found == chats.length)
+                            {
+                                allTalks.results = listOfTalks;
+                                res.render('inbox.html', {userNameReceived: result, allTalks: JSON.stringify(allTalks)});
+                            }
+                        });
+                    }
+                }
+                else
+                {
+                    res.writeHead(404, {"Content-Type": "text/html"});
+                    res.write("not found");
+                    res.end();
+                }
+            });
+        }
+        else
+        {
+            res.render('homepage_inital.html', {});
+        }
     }
 });
 
@@ -632,36 +658,39 @@ router.get('/message&username=*', function(req, res, next) {
     {
         res.render('homepage_inital.html', {});
     }
-    var uname_logged = cookieSign.unsign(req.cookies.tutorMeData, secret);
-    if(uname_logged)
+    else
     {
-        if(req.url.length <= 18)
+        var uname_logged = cookieSign.unsign(req.cookies.tutorMeData, secret);
+        if(uname_logged)
         {
-            res.writeHead(404, {"Content-Type": "text/html"});
-            res.write("not found");
-            res.end();
+            if(req.url.length <= 18)
+            {
+                res.writeHead(404, {"Content-Type": "text/html"});
+                res.write("not found");
+                res.end();
+            }
+            else
+            {
+                var uname = req.url.substring(18);
+                User.find({username: uname}, function(err, user) {
+                    if (err) return console.error(err);
+                    if(user[0])
+                    {
+                        res.render('message.html', {logged: uname_logged, receiver: uname});
+                    }
+                    else
+                    {
+                        res.writeHead(404, {"Content-Type": "text/html"});
+                        res.write("not found");
+                        res.end();
+                    }
+                });
+            }
         }
         else
         {
-            var uname = req.url.substring(18);
-            User.find({username: uname}, function(err, user) {
-                if (err) return console.error(err);
-                if(user[0])
-                {
-                    res.render('message.html', {logged: uname_logged, receiver: uname});
-                }
-                else
-                {
-                    res.writeHead(404, {"Content-Type": "text/html"});
-                    res.write("not found");
-                    res.end();
-                }
-            });
+            res.redirect('/');
         }
-    }
-    else
-    {
-        res.redirect('/');
     }
 
 });
@@ -806,18 +835,18 @@ router.post('/searchFind', function(req, res, next){
   });
 
 
-  User.find({name: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, name) { 
-    resultNames = name; 
+  User.find({name: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, name) {
+    resultNames = name;
     return;
   });
 
-  User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, rate) { 
-    resultPrice = rate; 
+  User.find({rate: searchedTerm, tutor: true}).sort({sum_rating: -1}).exec(function(err, rate) {
+    resultPrice = rate;
     return;
   });
 
-  User.find({subjects: { $in: [searchedTerm] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
-    resultSubject = sub; 
+  User.find({subjects: { $in: [searchedTerm] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) {
+    resultSubject = sub;
     return;
   });
 
@@ -834,8 +863,8 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
-        sameLocation = location; 
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) {
+        sameLocation = location;
         return;
       });
     });
@@ -846,8 +875,8 @@ router.post('/searchFind', function(req, res, next){
 
 //Subject Searchs
  router.post('/searchSubject', function(req, res, next){
-  User.find({subjects: { $in: [req.body.subject] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) { 
-    resultSubject = sub; 
+  User.find({subjects: { $in: [req.body.subject] } , tutor: true}).sort({sum_rating: -1}).exec(function(err, sub) {
+    resultSubject = sub;
     return;
   });
 
@@ -863,8 +892,8 @@ router.post('/searchFind', function(req, res, next){
     //Find current user location
     User.find({username: result}, function(err, user) {
       console.dir(user[0].city);
-      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) { 
-        sameLocation = location; 
+      User.find({city: user[0].city, country: user[0].country, tutor: true}).sort({sum_rating: -1, rate: 1}).exec(function(err, location) {
+        sameLocation = location;
         return;
       });
     });
@@ -1069,7 +1098,7 @@ io.on('connection', function(client){
   console.log('a user connected');
 
   //when the user finishes the last step in creating the account using facebook
-  //the page sends to the server the new information and the server updates the 
+  //the page sends to the server the new information and the server updates the
   //the user information
   client.on('fb', function(data){
 
