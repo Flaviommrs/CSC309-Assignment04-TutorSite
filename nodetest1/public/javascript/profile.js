@@ -52,11 +52,7 @@ function loadUser(username) {
 
     request.done(function(msg) {
         var json = JSON.parse(msg);
-
-        if (json["picture"] != ""){
-            document.getElementById("profilepic").src = json["picture"];
-        }
-
+        document.getElementById("profilepic").src = json["picture"];
         document.getElementById("pp").innerHTML = json["username"]+"'s PROFILE";
         document.getElementById("name").innerHTML = "Name: " + json["name"];
         document.getElementById("occupation").innerHTML = "Occupation: " + json["occupation"];
@@ -98,10 +94,7 @@ function loadReviews(username) {
         var json = JSON.parse(msg);
         document.getElementById("reviews").innerHTML += `<p class="re">REVIEWS</p>`
         for (var index = 0; index< json.length; index++){
-            var pic = "/images/profile.jpg";
-            if (json[index]["picture"] != ""){
-                pic = json[index]["picture"];
-            }
+            var pic = json[index]["picture"];
             var string = `<div class="review">
                     <div class="inline review-content">
                         <div class="leftreview">

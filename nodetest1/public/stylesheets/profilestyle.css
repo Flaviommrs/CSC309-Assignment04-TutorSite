@@ -232,13 +232,11 @@ border-radius: 3px 0 0 3px;
 
 #profilepic {
     width: 300px;
-    height: auto;
+    max-height: 400px;
     vertical-align: top;
     left: 0;
     border: 2px solid black;
 }
-
-#logo { height: 100px; width: 200px; overflow: hidden; }
 
 .inline > * {
     display: inline-block;
@@ -282,7 +280,7 @@ border-radius: 3px 0 0 3px;
 
 #reviewpic {
     width: 150px;
-    height: auto;
+    max-height: 200px;
     border: 2px solid black;
     vertical-align: top;
     margin-left: auto;
