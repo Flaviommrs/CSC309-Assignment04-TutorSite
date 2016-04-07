@@ -118,12 +118,38 @@
       return newArray;
     }
 
+    function checkAllForms()
+    {
+        //use this function to do more checkings - future implementation
+        //Function to check all the forms for the righ format of the inputs
+        var passwordReceived = document.getElementById('password').value;
+        var lowercase = /[a-z]+/;
+        var uppercase = /[A-Z]+/;
+        var number = /[0-9]+/;
+        var pass = true;
+        if(passwordReceived.search(lowercase) == -1)
+        {
+            pass = false;
+        }
+        if(passwordReceived.search(uppercase) == -1)
+        {
+            pass = false;
+        }
+        if(passwordReceived.search(number) == -1)
+        {
+            pass = false;
+        }
+        return pass;
+    }
+
     $(function() {
         $('form').submit(function() {
 
-            //TODO: implement this function
-            //Function to check all the forms for the righ format of the inputs
-            //checkAllForms();
+            if(!checkAllForms())
+            {
+                alert("Your password must contain both a lowercase and uppercase letter, and a number.");
+                return false;
+            }
 
             /** PARSING OF THE EVENTS **/
             var TWO_HOURS = 7200;
