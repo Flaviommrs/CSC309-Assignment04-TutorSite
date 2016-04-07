@@ -1,10 +1,8 @@
 //Requires
 var express = require('express');
-var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var cookieSign = require('cookie-signature');
 var app = require('express')();
-app.use(compression());
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
