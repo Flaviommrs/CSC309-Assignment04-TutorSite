@@ -3,7 +3,7 @@
 <!--Head Info-->
   <head>
     <link rel="stylesheet" type="text/css" href="/stylesheets/editprofilestyle.css">
-    <title>Tutor Me</title> 
+    <title>Tutor Me</title>
     <link rel="icon" href="images/favicon.png"> <!-- favicon not yet made -->
   </head>
 
@@ -17,7 +17,7 @@
                 <button type="submit">Search</button>
             </form>
         </div>
-		
+
         <div id="profile">
         	<div class="left">
                 <div class="right">
@@ -32,7 +32,7 @@
                     Phone Number: <input type="tel" name="number" pattern="^\d{3}-\d{3}-\d{4}$" placeholder="xxx-xxx-xxxx"><br><br>
                     Email: <input  type="email" name="email" placeholder="Email..." value=<%=userinfo.email%>><br><br>
                     Location: <input type="text" name="city" placeholder="City" value=<%=userinfo.city%>><input type="text" name="country" placeholder="Country" value=<%=userinfo.country%>><br><br>
-                    Tutoring:    
+                    Tutoring:
                         <td><input type='checkbox' name='math' id='math' value="Math"/>
                             <label for="math">Math</label></td>
                             <td><input type='checkbox' name='biology' id='biology' value="Biology"/>
@@ -54,8 +54,8 @@
                         </tr><br><br>
 
                     Base Rate Per Hour: <input type="text" name="rate" value=<%=userinfo.rate%> placeholder=<%=userinfo.rate%>><br><br>
-                    Occupation: <input type="text" name="occupation" size="30" value=<%=userinfo.occupation%> placeholder=<%=userinfo.occupation%>><br><br>
-                    Education: <input type="text" name="education" value=<%=userinfo.education%> placeholder=<%=userinfo.education%>><br><br>
+                    Occupation: <input type="text" name="occupation" size="30" placeholder="Occupation" value=<%=userinfo.occupation%>><br><br>
+                    Education: <input type="text" name="education" placeholder="Education" value=<%=userinfo.education%>><br><br>
                     Past Experience: <br><br><textarea rows="4" cols="100" name="experience" placeholder="My past Experiences..." ><%=userinfo.experience%></textarea><br><br>
                     About Me: <br><br><textarea rows="7" cols="100" name="about" placeholder="About Me..."><%=userinfo.about%></textarea><br><br>
                     <button class="button">Update Profile</button>
@@ -66,4 +66,4 @@
         </div>
     </body>
 
-</html>  
+</html>
