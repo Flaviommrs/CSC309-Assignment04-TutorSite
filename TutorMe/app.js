@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 
 var app = express();
+app.set('port', (process.env.PORT || 3000));
 
 // view engine setup
 app.set('view engine', 'ejs');
